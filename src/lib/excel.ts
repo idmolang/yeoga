@@ -2,7 +2,7 @@
 
 import * as XLSX from "xlsx";
 import { ddayLabel } from "@/lib/date";
-import { sortTodos } from "@/lib/sort";
+import { sortPacking, sortTodos } from "@/lib/sort";
 import { LABELS, type Trip } from "@/types/trip";
 
 const ox = (v: boolean) => (v ? "O" : "X");
@@ -106,13 +106,11 @@ export function exportTripToExcel(trip: Trip) {
   );
   XLSX.utils.book_append_sheet(wb, toSheet(budgetRows, ["금액(원)"]), "예산");
 
-  // 5) 준비물: 분류 순
+  // 5) 준비물: 분류 순 (필수품 → 의류 → 세면 → 전자기기 → 기타)
   XLSX.utils.book_append_sheet(
     wb,
     toSheet(
-      [...trip.packing]
-        .sort((a, b) => a.group.localeCompare(b.group))
-        .map((p) => ({ 챙김: ox(p.packed), 분류: p.group, 준비물: p.name })),
+      sortPacking(trip.packing).map((p) => ({ 챙김: ox(p.packed), 분류: p.group, 준비물: p.name })),
     ),
     "준비물",
   );

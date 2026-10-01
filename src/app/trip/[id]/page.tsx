@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { use, useState } from "react";
 import ClientOnly from "@/components/ClientOnly";
+import PackingTab from "@/components/trip/PackingTab";
 import TodoTab from "@/components/trip/TodoTab";
 import { ddayLabel } from "@/lib/date";
 import { exportTripToExcel } from "@/lib/excel";
@@ -134,29 +135,7 @@ function TripDetail({ id }: { id: string }) {
         </section>
       )}
 
-      {tab === "준비물" && (
-        <section className="space-y-2">
-          {/* TODO(F-10): 준비물 추가 폼 (준비물, 분류) */}
-          {trip.packing.map((item) => (
-            <label key={item.id} className="flex items-center gap-3 px-2 py-1">
-              <input
-                type="checkbox"
-                checked={item.packed}
-                onChange={() =>
-                  update({
-                    ...trip,
-                    packing: trip.packing.map((p) =>
-                      p.id === item.id ? { ...p, packed: !p.packed } : p,
-                    ),
-                  })
-                }
-              />
-              <span className={item.packed ? "text-slate-400 line-through" : ""}>{item.name}</span>
-              <span className="text-xs text-slate-500">{item.group}</span>
-            </label>
-          ))}
-        </section>
-      )}
+      {tab === "준비물" && <PackingTab trip={trip} update={update} />}
     </div>
   );
 }

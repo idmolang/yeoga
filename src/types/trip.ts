@@ -80,3 +80,6 @@ export const LABELS = {
   },
   slot: { morning: "오전", afternoon: "오후", evening: "저녁" },
 } as const;
+
+/** 준비물 분류 (FRD 6장 준비물 추가 폼). 화면·엑셀은 이 순서로 묶는다 */
+export const PACKING_GROUPS = ["필수품", "의류", "세면", "전자기기", "기타"] as const;
