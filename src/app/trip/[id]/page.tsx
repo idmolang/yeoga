@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { use, useState } from "react";
 import ClientOnly from "@/components/ClientOnly";
+import TodoTab from "@/components/trip/TodoTab";
 import { ddayLabel } from "@/lib/date";
 import { exportTripToExcel } from "@/lib/excel";
 import { getTrip, upsertTrip } from "@/lib/storage";
@@ -90,32 +91,7 @@ function TripDetail({ id }: { id: string }) {
         ))}
       </nav>
 
-      {tab === "할 일" && (
-        <section className="space-y-2">
-          {/* TODO(F-05): 할 일 추가 폼 (할 일, 마감일, 담당자), 삭제 버튼 */}
-          {trip.todos.map((todo) => (
-            <label key={todo.id} className="flex items-center gap-3 rounded-lg px-2 py-2">
-              <input
-                type="checkbox"
-                checked={todo.done}
-                onChange={() =>
-                  update({
-                    ...trip,
-                    todos: trip.todos.map((t) => (t.id === todo.id ? { ...t, done: !t.done } : t)),
-                  })
-                }
-              />
-              <span className={`flex-1 ${todo.done ? "text-slate-400 line-through" : ""}`}>
-                {todo.title}
-              </span>
-              {todo.urgent && !todo.done && (
-                <span className="rounded bg-red-100 px-2 py-0.5 text-xs text-red-700">급함</span>
-              )}
-              <span className="w-16 text-right text-sm text-slate-500">{ddayLabel(todo.dueDate)}</span>
-            </label>
-          ))}
-        </section>
-      )}
+      {tab === "할 일" && <TodoTab trip={trip} update={update} />}
 
       {tab === "일정" && (
         <section className="space-y-4">

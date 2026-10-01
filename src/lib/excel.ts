@@ -2,6 +2,7 @@
 
 import * as XLSX from "xlsx";
 import { ddayLabel } from "@/lib/date";
+import { sortTodos } from "@/lib/sort";
 import { LABELS, type Trip } from "@/types/trip";
 
 const ox = (v: boolean) => (v ? "O" : "X");
@@ -55,19 +56,17 @@ export function exportTripToExcel(trip: Trip) {
     "요약",
   );
 
-  // 2) 할 일: 마감일 순
+  // 2) 할 일: 마감일 순 (마감일 없는 항목은 맨 뒤)
   XLSX.utils.book_append_sheet(
     wb,
     toSheet(
-      [...trip.todos]
-        .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
-        .map((t) => ({
-          완료: ox(t.done),
-          "할 일": t.title,
-          마감일: t.dueDate,
-          "D-day": ddayLabel(t.dueDate),
-          담당자: t.assignee,
-        })),
+      sortTodos(trip.todos).map((t) => ({
+        완료: ox(t.done),
+        "할 일": t.title,
+        마감일: t.dueDate || "-",
+        "D-day": t.dueDate ? ddayLabel(t.dueDate) : "-",
+        담당자: t.assignee,
+      })),
     ),
     "할 일",
   );

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { addDays, todayISO } from "@/lib/date";
 import { createTrip } from "@/lib/generate";
 import ClientOnly from "@/components/ClientOnly";
+import { choice, input } from "@/components/styles";
 import { clearDraft, loadDraft, saveDraft, upsertTrip } from "@/lib/storage";
 import { LABELS, type Companion, type QuickStartAnswers, type Region, type Style } from "@/types/trip";
 
@@ -31,11 +32,6 @@ const EMPTY: QuickStartAnswers = {
   budgetPerPerson: 300000,
   styles: [],
 };
-
-const input =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 dark:border-slate-600 dark:bg-slate-900";
-const choice =
-  "flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 px-4 py-3 has-[:checked]:border-sky-700 has-[:checked]:bg-sky-50 dark:border-slate-600 dark:has-[:checked]:bg-sky-950";
 
 export default function NewTripPage() {
   return (
