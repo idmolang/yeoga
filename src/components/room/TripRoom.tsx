@@ -3,6 +3,7 @@
 // 여행방: 데이터를 불러와 Context 로 내려주고, 단계(모으기·조율 / 준비)에 맞는 화면을 보여준다
 
 import { useCallback, useMemo, useState } from "react";
+import PrepView from "@/components/prep/PrepView";
 import CoordinationView from "@/components/room/CoordinationView";
 import InvitePanel from "@/components/room/InvitePanel";
 import MembersCard from "@/components/room/MembersCard";
@@ -91,7 +92,7 @@ export default function TripRoom({ tripId, me, created }: { tripId: string; me: 
 
         {showInvite && <InvitePanel trip={trip} onClose={() => setShowInvite(false)} />}
 
-        {trip.status === "confirmed" ? <p className={muted}>준비 단계 화면을 만드는 중이에요.</p> : <CoordinationView />}
+        {trip.status === "confirmed" ? <PrepView /> : <CoordinationView />}
 
         <MembersCard />
       </div>
