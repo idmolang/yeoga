@@ -12,6 +12,7 @@ import TripHeader from "@/components/room/TripHeader";
 import { ghostButton, muted, secondaryButton } from "@/components/styles";
 import { coordinate } from "@/lib/coordinate";
 import { errorMessage } from "@/lib/db";
+import { exportRoomToExcel } from "@/lib/excel";
 import { stageOf } from "@/lib/stage";
 import { useRoom } from "./useRoom";
 
@@ -83,6 +84,9 @@ export default function TripRoom({ tripId, me, created }: { tripId: string; me: 
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" className={secondaryButton} onClick={() => setShowInvite((v) => !v)} aria-expanded={showInvite}>
             친구 초대
+          </button>
+          <button type="button" className={secondaryButton} onClick={() => exportRoomToExcel(room.data).catch(() => setActionError("엑셀 파일을 만들지 못했어요."))}>
+            엑셀로 다운로드
           </button>
           <button type="button" className={ghostButton} onClick={refresh}>
             새로고침
