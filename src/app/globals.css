@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f9fb;
+  --background: #f6f8fa;
   --foreground: #16202a;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -12,8 +13,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #10161c;
+    --background: #0d1318;
     --foreground: #e6edf3;
+    color-scheme: dark;
   }
 }
 
@@ -21,4 +23,5 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  overflow-wrap: anywhere;
 }
