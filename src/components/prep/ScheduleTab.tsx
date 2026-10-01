@@ -6,12 +6,13 @@
 
 import { useState, type FormEvent } from "react";
 import FieldError from "@/components/FieldError";
+import ScheduleTimeEditor from "@/components/prep/ScheduleTimeEditor";
 import { useRoomContext } from "@/components/room/RoomContext";
 import { badge, badgeTone, card, deleteButton, fieldLabel, input, muted, primaryButton, secondaryButton, dangerButton } from "@/components/styles";
 import { dateRange, formatKDate } from "@/lib/date";
 import { deleteRow, deleteWhere, insertRow, updateRow } from "@/lib/db";
 import { BOOKING_DAYS_BEFORE, bookingTodoTitle, deadline } from "@/lib/generate";
-import { slotFromTime } from "@/lib/schedule";
+import { slotFromTime, slotHasContent } from "@/lib/schedule";
 import { sortSlots } from "@/lib/sort";
 import { useValidation } from "@/lib/validation";
 import type { SlotRow } from "@/types/db";
@@ -21,7 +22,6 @@ import { LABELS } from "@/types/trip";
 type Editing = { kind: "edit"; id: string } | { kind: "new"; date: string } | null;
 
 const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
-const hasContent = (s: SlotRow) => !!(s.place || s.activity || s.memo || s.cost);
 
 export default function ScheduleTab() {
   const { data, supabase, run, me } = useRoomContext();
@@ -62,7 +62,7 @@ export default function ScheduleTab() {
   };
 
   const remove = async (s: SlotRow) => {
-    if (hasContent(s) && !confirm("이 일정을 삭제할까요? 의견과 좋아요도 함께 지워져요.")) return;
+    if (slotHasContent(s) && !confirm("이 일정을 삭제할까요? 의견과 좋아요도 함께 지워져요.")) return;
     if (await run(() => deleteRow(supabase, "schedule_slots", s.id))) setEditing(null);
   };
 
@@ -75,7 +75,7 @@ export default function ScheduleTab() {
 
   return (
     <section className="space-y-6">
-      {/* ScheduleTimeEditor: 출발·귀가 시간 변경 자리 (방장) */}
+      <ScheduleTimeEditor />
       {/* ScheduleBookingLinks: 예약 사이트 바로가기 자리 (F-15) */}
       {totalCost > 0 && <p className={muted}>예상 비용 합계 {won(totalCost)}</p>}
       {notice && (

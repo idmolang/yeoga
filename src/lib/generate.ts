@@ -2,7 +2,8 @@
 // 규칙은 src/data/rules.json 에 있다. 항목을 늘리려면 JSON만 고치면 된다. (v0.1 규칙 그대로 재사용)
 
 import rules from "@/data/rules.json";
-import { addDays, dateRange, diffDays, todayISO } from "@/lib/date";
+import { addDays, diffDays, todayISO } from "@/lib/date";
+import { buildSchedule } from "@/lib/schedule";
 import type { PackingCategory } from "@/types/db";
 import type { BudgetCategory, Region, Slot, Style } from "@/types/trip";
 
@@ -53,22 +54,9 @@ function makeTodos(a: PlanInput): PlanTodo[] {
     .sort((x, y) => x.due_date.localeCompare(y.due_date));
 }
 
+/** 출발·귀가 시간을 반영한 일정 틀 (규칙은 lib/schedule.ts) */
 function makeSchedule(a: PlanInput): PlanSlot[] {
-  const days = dateRange(a.startDate, a.endDate);
-  const slots: Slot[] = ["morning", "afternoon", "evening"];
-  return days.flatMap((date, i) =>
-    slots.map((slot) => {
-      const depart = i === 0 && slot === "morning";
-      const back = i === days.length - 1 && slot === "evening";
-      return {
-        date,
-        slot,
-        time: "",
-        activity: depart ? "출발·이동" : back ? "귀가" : "",
-        marker: depart ? ("depart" as const) : back ? ("return" as const) : null,
-      };
-    }),
-  );
+  return buildSchedule({ startDate: a.startDate, endDate: a.endDate, departTime: a.departTime, returnTime: a.returnTime });
 }
 
 function makeBudget(a: PlanInput): PlanBudget[] {
