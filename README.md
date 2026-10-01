@@ -21,16 +21,27 @@ Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · SheetJS(x
 src/
 ├─ app/
 │  ├─ page.tsx            # 메인: 여행 목록 (F-09)
-│  ├─ new/page.tsx        # 빠른 시작 단계형 폼 (F-01)
-│  └─ trip/[id]/page.tsx  # 여행 상세 탭 + 엑셀 다운로드 (F-08)
+│  ├─ new/page.tsx        # 빠른 시작 단계형 폼 (F-01) + 여행지 추천 단계 (F-02)
+│  └─ trip/[id]/page.tsx  # 여행 상세: 탭 전환 + 엑셀 다운로드 (F-08)
 ├─ components/
-│  └─ ClientOnly.tsx      # localStorage를 브라우저에서만 읽게 해주는 래퍼
+│  ├─ ClientOnly.tsx      # localStorage를 브라우저에서만 읽게 해주는 래퍼
+│  ├─ FieldError.tsx      # 필드 아래 한국어 오류 문구 (N-05)
+│  ├─ styles.ts           # 폼 공용 Tailwind 클래스
+│  └─ trip/
+│     ├─ TodoTab.tsx      # 할 일 탭 (F-05)
+│     ├─ ScheduleTab.tsx  # 일정 탭 (F-04)
+│     ├─ BudgetTab.tsx    # 예산 탭 (F-06)
+│     └─ PackingTab.tsx   # 준비물 탭 (F-10)
 ├─ data/
-│  └─ rules.json          # 자동 생성 규칙 (할 일, 준비물, 예산 비율)
+│  ├─ rules.json          # 자동 생성 규칙 (할 일, 준비물, 예산 비율)
+│  └─ destinations.json   # 여행지 추천 후보 (국내 10, 해외 10)
 ├─ lib/
+│  ├─ budget.ts           # 예산 합계·1인당·카테고리별 계산 (F-06)
 │  ├─ date.ts             # 날짜 계산, D-day
 │  ├─ excel.ts            # 엑셀 내보내기 (F-08)
-│  ├─ generate.ts         # 뼈대 자동 생성 (F-03)
+│  ├─ generate.ts         # 뼈대 자동 생성 (F-03), 마감 계산
+│  ├─ recommend.ts        # 여행지 추천 점수 계산 (F-02)
+│  ├─ sort.ts             # 화면·엑셀 공용 정렬 규칙
 │  └─ storage.ts          # localStorage 저장 (F-07)
 └─ types/
    └─ trip.ts             # 데이터 타입 (FRD 8장)
@@ -41,21 +52,23 @@ src/
 | ID | 기능 | 상태 | 위치 |
 | --- | --- | --- | --- |
 | F-01 | 빠른 시작 폼 (단계형) | 완료 | `app/new/page.tsx` |
-| F-02 | 여행지 추천 | TODO | `app/new/page.tsx` |
+| F-02 | 여행지 추천 | 완료 (추천받기 체크 시 6단계에서 후보 3곳 선택) | `app/new/page.tsx`, `lib/recommend.ts`, `data/destinations.json` |
 | F-03 | 뼈대 자동 생성 | 완료 | `lib/generate.ts`, `data/rules.json` |
-| F-04 | 일정 관리 | 보기만 됨, 수정 폼 TODO | `app/trip/[id]/page.tsx` |
-| F-05 | 할 일 체크리스트 | 체크 가능, 추가 폼 TODO | `app/trip/[id]/page.tsx` |
-| F-06 | 예산 관리 | 보기만 됨, 추가 폼 TODO | `app/trip/[id]/page.tsx` |
+| F-04 | 일정 관리 | 완료 (슬롯 수정·추가·삭제, 시간순 정렬, 예약 필요 → 할 일 자동 추가) | `components/trip/ScheduleTab.tsx` |
+| F-05 | 할 일 체크리스트 | 완료 (추가·삭제·체크, 마감일 순 정렬) | `components/trip/TodoTab.tsx` |
+| F-06 | 예산 관리 | 완료 (예산·지출 추가·삭제, 카테고리별 비교, 총액·1인당) | `components/trip/BudgetTab.tsx`, `lib/budget.ts` |
 | F-07 | 데이터 저장 | 완료 | `lib/storage.ts` |
-| F-08 | 엑셀 다운로드 | 완료 | `lib/excel.ts` |
+| F-08 | 엑셀 다운로드 | 완료 (5개 시트 모두 출력) | `lib/excel.ts` |
 | F-09 | 여행 목록 | 완료 | `app/page.tsx` |
-| F-10 | 준비물 관리 | 체크 가능, 추가 폼 TODO | `app/trip/[id]/page.tsx` |
+| F-10 | 준비물 관리 | 완료 (추가·삭제·체크, 중복 방지, 분류별 묶음) | `components/trip/PackingTab.tsx` |
 
-과제 기준(응답 받기 → 저장 → 엑셀 다운로드)은 F-01, F-07, F-08로 이미 충족됩니다. 코드에서 `TODO(F-xx)` 를 검색하면 다음에 만들 곳을 찾을 수 있어요.
+과제 기준(응답 받기 → 저장 → 엑셀 다운로드)은 F-01, F-07, F-08로 충족되고, FRD의 선택 기능(F-02, F-06, F-10)까지 모두 구현되어 있습니다.
 
 ## 자동 생성 규칙 바꾸기
 
 `src/data/rules.json` 만 수정하면 됩니다. `when` 조건으로 `always`, `domestic`, `overseas`, `style:food` 같은 스타일 조건, `nights>=3` 같은 숙박 수 조건을 쓸 수 있어요.
+
+여행지 추천 후보는 `src/data/destinations.json` 에서 고칩니다. `baseCost`(1인 왕복 교통비)와 `nightCost`(1인 1박 비용)는 서울 출발 기준의 대략적인 값이고, `minNights`~`maxNights` 는 추천 박수입니다.
 
 ## 배포 (Vercel)
 
