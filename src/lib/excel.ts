@@ -2,7 +2,8 @@
 
 import * as XLSX from "xlsx";
 import { ddayLabel } from "@/lib/date";
-import { sortPacking, sortTodos } from "@/lib/sort";
+import { summarizeBudget } from "@/lib/budget";
+import { sortBudget, sortPacking, sortTodos } from "@/lib/sort";
 import { LABELS, type Trip } from "@/types/trip";
 
 const ox = (v: boolean) => (v ? "O" : "X");
@@ -90,19 +91,19 @@ export function exportTripToExcel(trip: Trip) {
     "일정",
   );
 
-  // 4) 예산: 카테고리 순 + 합계 행
-  const budgetRows: Record<string, string | number>[] = [...trip.budget]
-    .sort((a, b) => a.category.localeCompare(b.category))
-    .map((b) => ({
-      카테고리: LABELS.budgetCategory[b.category],
-      항목: b.title,
-      구분: b.kind === "plan" ? "예산" : "실제 지출",
-      "금액(원)": b.amount,
-    }));
-  const planTotal = trip.budget.filter((b) => b.kind === "plan").reduce((s, b) => s + b.amount, 0);
+  // 4) 예산: 카테고리 순 + 합계·1인당 행 (예산과 실제 지출 각각)
+  const budget = summarizeBudget(trip);
+  const budgetRows: Record<string, string | number>[] = sortBudget(trip.budget).map((b) => ({
+    카테고리: LABELS.budgetCategory[b.category],
+    항목: b.title,
+    구분: b.kind === "plan" ? "예산" : "실제 지출",
+    "금액(원)": b.amount,
+  }));
   budgetRows.push(
-    { 카테고리: "합계", 항목: "", 구분: "예산", "금액(원)": planTotal },
-    { 카테고리: "1인당", 항목: "", 구분: "예산", "금액(원)": Math.round(planTotal / trip.people) },
+    { 카테고리: "합계", 항목: "", 구분: "예산", "금액(원)": budget.plan },
+    { 카테고리: "합계", 항목: "", 구분: "실제 지출", "금액(원)": budget.actual },
+    { 카테고리: "1인당", 항목: "", 구분: "예산", "금액(원)": budget.planPerPerson },
+    { 카테고리: "1인당", 항목: "", 구분: "실제 지출", "금액(원)": budget.actualPerPerson },
   );
   XLSX.utils.book_append_sheet(wb, toSheet(budgetRows, ["금액(원)"]), "예산");
 

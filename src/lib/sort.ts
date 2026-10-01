@@ -1,6 +1,13 @@
 // 화면과 엑셀이 같은 순서로 보여주도록 정렬 규칙을 한곳에 모은다
 
-import { PACKING_GROUPS, type PackingItem, type Todo } from "@/types/trip";
+import {
+  LABELS,
+  PACKING_GROUPS,
+  type BudgetCategory,
+  type BudgetItem,
+  type PackingItem,
+  type Todo,
+} from "@/types/trip";
 
 /** 마감일 오름차순. 마감일이 없는 할 일은 맨 뒤로 */
 export const sortTodos = (todos: Todo[]) =>
@@ -26,3 +33,14 @@ export const groupPacking = (items: PackingItem[]) => {
   }
   return [...groups.entries()];
 };
+
+/** 예산 카테고리 순서: 교통 → 숙소 → 식비 → 관광 → 기타 */
+export const BUDGET_CATEGORIES = Object.keys(LABELS.budgetCategory) as BudgetCategory[];
+
+/** 카테고리 순, 같은 카테고리 안에서는 예산 → 실제 지출 */
+export const sortBudget = (items: BudgetItem[]) =>
+  [...items].sort(
+    (a, b) =>
+      BUDGET_CATEGORIES.indexOf(a.category) - BUDGET_CATEGORIES.indexOf(b.category) ||
+      (a.kind === b.kind ? 0 : a.kind === "plan" ? -1 : 1),
+  );

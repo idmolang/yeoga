@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { use, useState } from "react";
 import ClientOnly from "@/components/ClientOnly";
+import BudgetTab from "@/components/trip/BudgetTab";
 import PackingTab from "@/components/trip/PackingTab";
 import TodoTab from "@/components/trip/TodoTab";
 import { ddayLabel } from "@/lib/date";
@@ -115,25 +116,7 @@ function TripDetail({ id }: { id: string }) {
         </section>
       )}
 
-      {tab === "예산" && (
-        <section className="space-y-2">
-          {/* TODO(F-06): 예산·지출 추가 폼 (항목, 카테고리, 금액, 예산/실제 지출) */}
-          {trip.budget.map((b) => (
-            <div key={b.id} className="flex justify-between text-sm">
-              <span>
-                {LABELS.budgetCategory[b.category]} · {b.title}
-              </span>
-              <span>{b.amount.toLocaleString("ko-KR")}원</span>
-            </div>
-          ))}
-          <div className="flex justify-between border-t border-slate-200 pt-2 font-semibold dark:border-slate-700">
-            <span>총예산</span>
-            <span>
-              {trip.budget.reduce((sum, b) => sum + b.amount, 0).toLocaleString("ko-KR")}원
-            </span>
-          </div>
-        </section>
-      )}
+      {tab === "예산" && <BudgetTab trip={trip} update={update} />}
 
       {tab === "준비물" && <PackingTab trip={trip} update={update} />}
     </div>
