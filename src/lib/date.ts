@@ -32,3 +32,24 @@ export const ddayLabel = (target: string) => {
   if (n === 0) return "D-day";
   return `D+${-n}`;
 };
+
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+/** 요일 (0=일요일) */
+export const weekday = (iso: string) => new Date(toUTC(iso)).getUTCDay();
+export const weekdayLabel = (iso: string) => WEEKDAYS[weekday(iso)];
+
+/** "11월 10일 (월)" */
+export const formatKDate = (iso: string) => {
+  const [, m, d] = iso.split("-").map(Number);
+  return `${m}월 ${d}일 (${weekdayLabel(iso)})`;
+};
+
+/** "11.10 ~ 11.13" 처럼 짧은 기간 */
+export const formatRange = (start: string, end: string) => {
+  const short = (iso: string) => {
+    const [, m, d] = iso.split("-").map(Number);
+    return `${m}.${d}`;
+  };
+  return start === end ? short(start) : `${short(start)} ~ ${short(end)}`;
+};
