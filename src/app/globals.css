@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f9fb;
+  --foreground: #16202a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #10161c;
+    --foreground: #e6edf3;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+}

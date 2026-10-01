@@ -1,0 +1,26 @@
+{
+  "todos": [
+    { "when": "always", "title": "숙소 예약", "daysBefore": 30 },
+    { "when": "always", "title": "교통편 예매 (기차·버스·렌터카)", "daysBefore": 21 },
+    { "when": "always", "title": "동행자와 일정 공유", "daysBefore": 7 },
+    { "when": "overseas", "title": "여권 유효기간 확인 (6개월 이상)", "daysBefore": 60 },
+    { "when": "overseas", "title": "항공권 예매", "daysBefore": 45 },
+    { "when": "overseas", "title": "환전 / 해외 결제 카드 준비", "daysBefore": 7 },
+    { "when": "overseas", "title": "여행자 보험 가입", "daysBefore": 3 },
+    { "when": "overseas", "title": "로밍 또는 eSIM 신청", "daysBefore": 3 },
+    { "when": "style:activity", "title": "체험·액티비티 예약", "daysBefore": 14 },
+    { "when": "style:food", "title": "가고 싶은 식당 리스트업·웨이팅 확인", "daysBefore": 7 }
+  ],
+  "packing": [
+    { "when": "always", "group": "필수품", "items": ["신분증", "충전기", "보조배터리", "상비약"] },
+    { "when": "always", "group": "세면", "items": ["세면도구"] },
+    { "when": "overseas", "group": "필수품", "items": ["여권", "멀티어댑터", "현지 통화"] },
+    { "when": "nights>=3", "group": "의류", "items": ["세탁망", "여벌 옷"] },
+    { "when": "style:relax", "group": "기타", "items": ["수영복", "선크림", "선글라스"] },
+    { "when": "style:activity", "group": "의류", "items": ["편한 운동화", "방수팩"] }
+  ],
+  "budgetRatio": {
+    "domestic": { "transport": 0.25, "lodging": 0.35, "food": 0.25, "tour": 0.15 },
+    "overseas": { "transport": 0.4, "lodging": 0.3, "food": 0.2, "tour": 0.1 }
+  }
+}
