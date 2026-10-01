@@ -6,6 +6,8 @@ import {
   type BudgetCategory,
   type BudgetItem,
   type PackingItem,
+  type ScheduleItem,
+  type Slot,
   type Todo,
 } from "@/types/trip";
 
@@ -43,4 +45,24 @@ export const sortBudget = (items: BudgetItem[]) =>
     (a, b) =>
       BUDGET_CATEGORIES.indexOf(a.category) - BUDGET_CATEGORIES.indexOf(b.category) ||
       (a.kind === b.kind ? 0 : a.kind === "plan" ? -1 : 1),
+  );
+
+/** 시간대 순서: 오전 → 오후 → 저녁 */
+export const SLOTS = Object.keys(LABELS.slot) as Slot[];
+
+/** 시간을 입력하면 시간대를 자동으로 정한다 (12시 전 오전, 18시 전 오후, 이후 저녁) */
+export const slotFromTime = (time: string): Slot => {
+  const hour = Number(time.slice(0, 2));
+  if (hour < 12) return "morning";
+  if (hour < 18) return "afternoon";
+  return "evening";
+};
+
+/** 날짜 → 시간대 → 시간 순 (시간이 비어 있으면 그 시간대 맨 앞) */
+export const sortSchedule = (items: ScheduleItem[]) =>
+  [...items].sort(
+    (a, b) =>
+      a.date.localeCompare(b.date) ||
+      SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot) ||
+      a.time.localeCompare(b.time),
   );

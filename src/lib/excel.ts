@@ -3,7 +3,7 @@
 import * as XLSX from "xlsx";
 import { ddayLabel } from "@/lib/date";
 import { summarizeBudget } from "@/lib/budget";
-import { sortBudget, sortPacking, sortTodos } from "@/lib/sort";
+import { sortBudget, sortPacking, sortSchedule, sortTodos } from "@/lib/sort";
 import { LABELS, type Trip } from "@/types/trip";
 
 const ox = (v: boolean) => (v ? "O" : "X");
@@ -72,11 +72,11 @@ export function exportTripToExcel(trip: Trip) {
     "할 일",
   );
 
-  // 3) 일정: 날짜 → 시간대 순 (생성 순서가 이미 날짜·시간대 순)
+  // 3) 일정: 날짜 → 시간대 → 시간 순
   XLSX.utils.book_append_sheet(
     wb,
     toSheet(
-      trip.schedule.map((s) => ({
+      sortSchedule(trip.schedule).map((s) => ({
         날짜: s.date,
         시간대: LABELS.slot[s.slot],
         시간: s.time,

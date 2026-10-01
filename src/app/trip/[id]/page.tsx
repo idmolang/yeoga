@@ -7,6 +7,7 @@ import { use, useState } from "react";
 import ClientOnly from "@/components/ClientOnly";
 import BudgetTab from "@/components/trip/BudgetTab";
 import PackingTab from "@/components/trip/PackingTab";
+import ScheduleTab from "@/components/trip/ScheduleTab";
 import TodoTab from "@/components/trip/TodoTab";
 import { ddayLabel } from "@/lib/date";
 import { exportTripToExcel } from "@/lib/excel";
@@ -95,26 +96,7 @@ function TripDetail({ id }: { id: string }) {
 
       {tab === "할 일" && <TodoTab trip={trip} update={update} />}
 
-      {tab === "일정" && (
-        <section className="space-y-4">
-          {/* TODO(F-04): 슬롯을 눌러 수정하는 일정 폼 (시간, 장소, 할 일, 비용, 예약 필요, 메모) */}
-          {[...new Set(trip.schedule.map((s) => s.date))].map((date, i) => (
-            <div key={date} className="space-y-1">
-              <h3 className="font-semibold">
-                {i + 1}일차 <span className="text-sm font-normal text-slate-500">{date}</span>
-              </h3>
-              {trip.schedule
-                .filter((s) => s.date === date)
-                .map((s) => (
-                  <div key={s.id} className="flex gap-3 text-sm">
-                    <span className="w-10 text-slate-500">{LABELS.slot[s.slot]}</span>
-                    <span>{s.activity || s.place || "비어 있음"}</span>
-                  </div>
-                ))}
-            </div>
-          ))}
-        </section>
-      )}
+      {tab === "일정" && <ScheduleTab trip={trip} update={update} />}
 
       {tab === "예산" && <BudgetTab trip={trip} update={update} />}
 

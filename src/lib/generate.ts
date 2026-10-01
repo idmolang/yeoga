@@ -28,22 +28,38 @@ function matches(when: string, a: QuickStartAnswers): boolean {
   return false;
 }
 
-function makeTodos(a: QuickStartAnswers): Todo[] {
+/** 출발 N일 전 마감. 이미 지났으면 마감을 "오늘"로 하고 급함 표시 */
+export function deadline(startDate: string, daysBefore: number) {
   const today = todayISO();
+  const due = addDays(startDate, -daysBefore);
+  const late = diffDays(today, due) < 0;
+  return { dueDate: late ? today : due, urgent: late };
+}
+
+/** 일정에서 "예약 필요"를 체크하면 추가되는 할 일 (F-04) */
+export const BOOKING_DAYS_BEFORE = 7;
+export const bookingTodoTitle = (place: string) => `${place} 예약하기`;
+
+export function makeBookingTodo(startDate: string, place: string): Todo {
+  return {
+    id: uid(),
+    title: bookingTodoTitle(place),
+    ...deadline(startDate, BOOKING_DAYS_BEFORE),
+    assignee: "",
+    done: false,
+  };
+}
+
+function makeTodos(a: QuickStartAnswers): Todo[] {
   return rules.todos
     .filter((r) => matches(r.when, a))
-    .map((r) => {
-      const due = addDays(a.startDate, -r.daysBefore);
-      const late = diffDays(today, due) < 0; // 마감이 이미 지났으면 "오늘"로 + 급함
-      return {
-        id: uid(),
-        title: r.title,
-        dueDate: late ? today : due,
-        assignee: "",
-        done: false,
-        urgent: late,
-      };
-    })
+    .map((r) => ({
+      id: uid(),
+      title: r.title,
+      ...deadline(a.startDate, r.daysBefore),
+      assignee: "",
+      done: false,
+    }))
     .sort((x, y) => x.dueDate.localeCompare(y.dueDate));
 }
 
