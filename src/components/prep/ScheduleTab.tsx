@@ -6,6 +6,7 @@
 
 import { useState, type FormEvent } from "react";
 import FieldError from "@/components/FieldError";
+import BookingLinks from "@/components/prep/BookingLinks";
 import ScheduleTimeEditor from "@/components/prep/ScheduleTimeEditor";
 import { useRoomContext } from "@/components/room/RoomContext";
 import { badge, badgeTone, card, deleteButton, fieldLabel, input, muted, primaryButton, secondaryButton, dangerButton } from "@/components/styles";
@@ -76,7 +77,7 @@ export default function ScheduleTab() {
   return (
     <section className="space-y-6">
       <ScheduleTimeEditor />
-      {/* ScheduleBookingLinks: 예약 사이트 바로가기 자리 (F-15) */}
+      <BookingLinks />
       {totalCost > 0 && <p className={muted}>예상 비용 합계 {won(totalCost)}</p>}
       {notice && (
         <p role="status" className="rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-800 dark:bg-sky-950 dark:text-sky-200">

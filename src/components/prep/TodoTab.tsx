@@ -4,8 +4,10 @@
 
 import { useState, type FormEvent } from "react";
 import FieldError from "@/components/FieldError";
+import BookingLinks from "@/components/prep/BookingLinks";
 import { useRoomContext } from "@/components/room/RoomContext";
 import { badge, badgeTone, card, deleteButton, fieldLabel, input, muted, primaryButton } from "@/components/styles";
+import { kindOfTodo } from "@/lib/booking";
 import { addDays, ddayLabel } from "@/lib/date";
 import { deleteRow, insertRow, updateRow } from "@/lib/db";
 import { sortTodos } from "@/lib/sort";
@@ -102,7 +104,7 @@ export default function TodoTab() {
                   )}
                 </select>
               </label>
-              {/* TodoBookingLinks: 예약 사이트 바로가기 자리 (F-15) */}
+              {kindOfTodo(todo.title) && <BookingLinks kinds={[kindOfTodo(todo.title)!]} compact />}
             </div>
           </li>
         ))}
