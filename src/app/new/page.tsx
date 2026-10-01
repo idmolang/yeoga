@@ -2,11 +2,13 @@
 
 // F-01 빠른 시작: 질문 5개를 한 단계씩 넘기며 응답받는 단계형 폼
 // 현재 단계의 필드만 화면에 있으므로, submit 때 브라우저가 그 단계만 검사한다.
+// F-02 "추천받기"를 체크하면 예산·스타일까지 받은 뒤 6단계에서 후보 3곳 중 하나를 고른다.
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { addDays, todayISO } from "@/lib/date";
 import { createTrip } from "@/lib/generate";
+import { formatEstimate, recommend } from "@/lib/recommend";
 import ClientOnly from "@/components/ClientOnly";
 import { choice, input } from "@/components/styles";
 import { clearDraft, loadDraft, saveDraft, upsertTrip } from "@/lib/storage";
@@ -19,6 +21,7 @@ const STEPS = [
   "예산은 얼마 정도예요?",
   "어떤 여행을 좋아해요?",
 ];
+const RECOMMEND_STEP = "이런 여행지는 어때요?"; // 추천받기를 체크했을 때만 붙는 마지막 단계
 
 const EMPTY: QuickStartAnswers = {
   name: "",
@@ -50,7 +53,8 @@ function QuickStartForm() {
     delete saved.step;
     return { ...EMPTY, ...saved };
   });
-  const [step, setStep] = useState(draft.step ?? 0);
+  const steps = answers.wantsRecommendation ? [...STEPS, RECOMMEND_STEP] : STEPS;
+  const [step, setStep] = useState(() => Math.min(draft.step ?? 0, steps.length - 1));
   const [error, setError] = useState("");
   const fieldsetRef = useRef<HTMLFieldSetElement>(null);
 
@@ -75,13 +79,15 @@ function QuickStartForm() {
         : [...answers.styles, style],
     );
 
-  const isLast = step === STEPS.length - 1;
+  const isLast = step === steps.length - 1;
+  // 후보는 추천 단계에서만 계산 (국내/해외·기간·예산·스타일이 모두 정해진 뒤)
+  const candidates = step === STEPS.length ? recommend(answers) : [];
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault(); // required/min/max 검사는 브라우저가 이미 통과시킨 상태
     setError("");
 
-    if (isLast && answers.styles.length === 0) {
+    if (step === 4 && answers.styles.length === 0) {
       setError("여행 스타일을 하나 이상 골라 주세요.");
       return;
     }
@@ -90,11 +96,8 @@ function QuickStartForm() {
       return;
     }
 
-    const trip = createTrip({
-      ...answers,
-      // TODO(F-02): 추천받기를 고르면 후보 3곳을 보여주고 선택하게 하기
-      destination: answers.wantsRecommendation ? "미정" : answers.destination.trim(),
-    });
+    // 추천받기를 했다면 destination에는 6단계에서 고른 후보 이름이 들어 있다
+    const trip = createTrip({ ...answers, destination: answers.destination.trim() || "미정" });
     if (!upsertTrip(trip)) {
       setError("저장되지 않았습니다. 브라우저 저장 공간을 확인해 주세요.");
       return;
@@ -108,18 +111,18 @@ function QuickStartForm() {
       {/* 진행 표시 */}
       <div className="space-y-2">
         <p className="text-sm text-slate-500">
-          {step + 1} / {STEPS.length}
+          {step + 1} / {steps.length}
         </p>
         <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700">
           <div
             className="h-full rounded-full bg-sky-700 transition-all"
-            style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+            style={{ width: `${((step + 1) / steps.length) * 100}%` }}
           />
         </div>
       </div>
 
       <fieldset key={step} ref={fieldsetRef} className="space-y-5">
-        <legend className="mb-5 text-2xl font-bold">{STEPS[step]}</legend>
+        <legend className="mb-5 text-2xl font-bold">{steps[step]}</legend>
 
         {step === 0 && (
           <>
@@ -222,6 +225,9 @@ function QuickStartForm() {
               />
               아직 못 정했어요, 추천받을래요
             </label>
+            {answers.wantsRecommendation && (
+              <p className="text-sm text-slate-500">예산과 스타일까지 답하면 마지막에 후보 3곳을 보여드려요.</p>
+            )}
           </>
         )}
 
@@ -276,12 +282,49 @@ function QuickStartForm() {
                 type="text"
                 className={input}
                 maxLength={30}
-                placeholder={`비워두면 "${answers.destination || "여행지"} 여행"`}
+                placeholder={`비워두면 "${
+                  (!answers.wantsRecommendation && answers.destination) || "여행지"
+                } 여행"`}
                 value={answers.name}
                 onChange={(e) => set("name", e.target.value)}
               />
             </label>
           </>
+        )}
+
+        {step === STEPS.length && (
+          <div className="space-y-2">
+            <p className="text-sm text-slate-500">
+              {LABELS.region[answers.region]} · 1인 {answers.budgetPerPerson.toLocaleString("ko-KR")}원 ·{" "}
+              {answers.styles.map((s) => LABELS.style[s]).join(", ")} 기준이에요.
+            </p>
+            {candidates.map(({ destination: d, estimate, reasons }) => (
+              <label
+                key={d.name}
+                className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-300 px-4 py-3 has-[:checked]:border-sky-700 has-[:checked]:bg-sky-50 dark:border-slate-600 dark:has-[:checked]:bg-sky-950"
+              >
+                <input
+                  type="radio"
+                  name="destination-pick"
+                  className="mt-1.5"
+                  required
+                  value={d.name}
+                  checked={answers.destination === d.name}
+                  onChange={() => set("destination", d.name)}
+                />
+                <span className="min-w-0 flex-1 space-y-1">
+                  <span className="flex flex-wrap items-baseline justify-between gap-x-2">
+                    <span className="text-lg font-semibold">{d.name}</span>
+                    <span className="text-sm text-slate-500">{formatEstimate(estimate)}</span>
+                  </span>
+                  <span className="block text-sm">{d.summary}</span>
+                  {reasons.length > 0 && (
+                    <span className="block text-xs text-sky-700 dark:text-sky-300">{reasons.join(" · ")}</span>
+                  )}
+                </span>
+              </label>
+            ))}
+          </div>
         )}
       </fieldset>
 
