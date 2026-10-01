@@ -11,6 +11,7 @@ export function errorMessage(error: unknown): string {
   const e = error as { message?: string; code?: string } | null;
   if (!e) return "알 수 없는 오류가 났어요.";
   if (e.code === "23505") return "이미 같은 이름이 있어요.";
+  if (e.code === "PGRST116") return "여행을 찾을 수 없어요. 방장이 방을 삭제했거나 방에서 나갔을 수 있어요.";
   if (e.code === "42501" || e.message?.includes("row-level security"))
     return "권한이 없어요. 응답 마감이나 방장 권한을 확인해 주세요.";
   if (e.code === "23514") return "입력값이 규칙에 맞지 않아요.";
