@@ -60,7 +60,9 @@ export default function InvitePanel({ trip, onClose }: { trip: TripRow; onClose?
     }
   };
 
-  const actions = SHARE_ACTIONS.filter((a) => !a.available || a.available());
+  // 지원 여부는 브라우저에서만 알 수 있으므로 서버 렌더링 때는 조건부 버튼을 숨긴다 (하이드레이션 불일치 방지)
+  const isClient = useSyncExternalStore(subscribe, () => true, () => false);
+  const actions = SHARE_ACTIONS.filter((a) => !a.available || (isClient && a.available()));
 
   return (
     <section className={card} aria-labelledby="invite-title">
