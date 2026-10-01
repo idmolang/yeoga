@@ -19,6 +19,7 @@
     { "when": "style:relax", "group": "기타", "items": ["수영복", "선크림", "선글라스"] },
     { "when": "style:activity", "group": "의류", "items": ["편한 운동화", "방수팩"] }
   ],
+  "sharedPacking": ["멀티어댑터", "상비약", "세탁망", "선크림"],
   "budgetRatio": {
     "domestic": { "transport": 0.25, "lodging": 0.35, "food": 0.25, "tour": 0.15 },
     "overseas": { "transport": 0.4, "lodging": 0.3, "food": 0.2, "tour": 0.1 }

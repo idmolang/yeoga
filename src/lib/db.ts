@@ -179,3 +179,65 @@ export async function upsertRow(db: DB, table: PlanTable, row: Record<string, un
 export async function confirmTrip(db: DB, tripId: string, plan: unknown) {
   check(await db.rpc("confirm_trip", { p_trip: tripId, p_plan: plan }));
 }
+
+// ───────── 조율 응답 ─────────
+
+export interface ResponseInput {
+  availableDates: string[];
+  budget: number;
+  styles: string[];
+  departSlot: string;
+  /** 투표할 기존 후보 id */
+  voteIds: string[];
+  /** 새로 제안하는 여행지 이름 (제안하면 바로 투표까지) */
+  proposals: string[];
+}
+
+/** 내 응답 저장: 응답 1행 upsert → 제안한 여행지 추가 → 투표를 원하는 상태로 맞춘다 */
+export async function saveResponse(db: DB, room: RoomData, me: string, input: ResponseInput) {
+  const tripId = room.trip.id;
+  check(
+    await db.from("responses").upsert(
+      {
+        trip_id: tripId,
+        user_id: me,
+        available_dates: [...input.availableDates].sort(),
+        budget: input.budget,
+        styles: input.styles,
+        depart_slot: input.departSlot,
+      },
+      { onConflict: "trip_id,user_id" },
+    ),
+  );
+
+  const wanted = new Set(input.voteIds);
+  for (const name of input.proposals) {
+    const existing = room.options.find((o) => o.name === name);
+    if (existing) {
+      wanted.add(existing.id);
+      continue;
+    }
+    const { data, error } = await db
+      .from("destination_options")
+      .insert({ trip_id: tripId, name })
+      .select("id")
+      .single();
+    if (error) throw error;
+    wanted.add(data.id);
+  }
+
+  const mine = room.votes.filter((v) => v.user_id === me).map((v) => v.option_id);
+  const remove = mine.filter((id) => !wanted.has(id));
+  const add = [...wanted].filter((id) => !mine.includes(id));
+  if (remove.length) {
+    check(await db.from("destination_votes").delete().eq("user_id", me).in("option_id", remove));
+  }
+  if (add.length) {
+    check(await db.from("destination_votes").insert(add.map((option_id) => ({ option_id, trip_id: tripId, user_id: me }))));
+  }
+}
+
+/** 여행지 후보 올리기 (추천 후보를 투표에 올릴 때) */
+export async function addOption(db: DB, tripId: string, name: string) {
+  check(await db.from("destination_options").insert({ trip_id: tripId, name }));
+}

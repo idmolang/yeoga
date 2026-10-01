@@ -3,11 +3,13 @@
 // 여행방: 데이터를 불러와 Context 로 내려주고, 단계(모으기·조율 / 준비)에 맞는 화면을 보여준다
 
 import { useCallback, useMemo, useState } from "react";
+import CoordinationView from "@/components/room/CoordinationView";
 import InvitePanel from "@/components/room/InvitePanel";
 import MembersCard from "@/components/room/MembersCard";
 import { RoomContext, type Room } from "@/components/room/RoomContext";
 import TripHeader from "@/components/room/TripHeader";
 import { ghostButton, muted, secondaryButton } from "@/components/styles";
+import { coordinate } from "@/lib/coordinate";
 import { errorMessage } from "@/lib/db";
 import { stageOf } from "@/lib/stage";
 import { useRoom } from "./useRoom";
@@ -61,9 +63,10 @@ export default function TripRoom({ tripId, me, created }: { tripId: string; me: 
   }
 
   const { trip, responses } = room.data;
+  const recommended = trip.status === "confirmed" ? 0 : coordinate(room.data).budget.recommended;
   const stage = stageOf(trip, responses.length);
   const people = trip.status === "confirmed" ? `${room.going.length}명` : `${room.data.members.length}명 참여`;
-  const budget = trip.budget_per_person ? won(trip.budget_per_person) : "조율 중";
+  const budget = trip.budget_per_person ? won(trip.budget_per_person) : recommended ? `추천 ${won(recommended)}` : "조율 중";
 
   return (
     <RoomContext.Provider value={room}>
@@ -87,6 +90,8 @@ export default function TripRoom({ tripId, me, created }: { tripId: string; me: 
         </div>
 
         {showInvite && <InvitePanel trip={trip} onClose={() => setShowInvite(false)} />}
+
+        {trip.status === "confirmed" ? <p className={muted}>준비 단계 화면을 만드는 중이에요.</p> : <CoordinationView />}
 
         <MembersCard />
       </div>

@@ -1,9 +1,9 @@
-// F-02 여행지 추천: 국내/해외가 같은 후보 중 기간·1인 예산·스타일 일치 점수가 높은 3곳
+// F-07 여행지 후보 추천 (v0.1 F-02 추천 로직 재사용): 국내/해외가 같은 후보 중 기간·1인 예산·스타일 일치 점수가 높은 3곳
 // 후보 데이터는 src/data/destinations.json 에 있다. 여행지를 늘리려면 JSON만 고치면 된다.
 
 import destinations from "@/data/destinations.json";
 import { diffDays } from "@/lib/date";
-import { LABELS, type QuickStartAnswers, type Region, type Style } from "@/types/trip";
+import { LABELS, type Region, type Style } from "@/types/trip";
 
 export interface Destination {
   name: string;
@@ -27,7 +27,14 @@ const DESTINATIONS = destinations as Destination[];
 
 const manwon = (n: number) => `${Math.round(n / 10000).toLocaleString("ko-KR")}만 원`;
 
-type Criteria = Pick<QuickStartAnswers, "region" | "startDate" | "endDate" | "budgetPerPerson" | "styles">;
+/** 추천 기준: 국내/해외, 기간, 1인 예산, 스타일 (조율 단계에서는 응답 집계값을 넣는다) */
+export interface Criteria {
+  region: Region;
+  startDate: string;
+  endDate: string;
+  budgetPerPerson: number;
+  styles: Style[];
+}
 
 export function recommend(a: Criteria, count = 3): Recommendation[] {
   const nights = Math.max(diffDays(a.startDate, a.endDate), 0);
