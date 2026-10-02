@@ -16,3 +16,10 @@ export function nicknameOf(user: User) {
   );
   return (name ?? "여행자").trim().slice(0, 10);
 }
+
+/** 소셜 계정의 프로필 사진 주소 (https 만 쓴다) */
+export function avatarOf(user: User) {
+  const m = user.user_metadata ?? {};
+  const url = [m.avatar_url, m.picture].find((v): v is string => typeof v === "string" && v.startsWith("https://"));
+  return url ?? null;
+}

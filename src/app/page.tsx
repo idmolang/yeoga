@@ -4,6 +4,7 @@ import Link from "next/link";
 import { badge, badgeTone, h1, h2, muted, primaryButton } from "@/components/styles";
 import { formatRange } from "@/lib/date";
 import { listMyTrips, type TripListItem } from "@/lib/db";
+import { requireProfile } from "@/lib/profile";
 import { ddayText, stageLabel, stageOf } from "@/lib/stage";
 import { createClient } from "@/lib/supabase/server";
 
@@ -45,6 +46,7 @@ export default async function HomePage() {
     );
   }
 
+  await requireProfile(supabase, user, "/");
   const trips = await listMyTrips(supabase).catch(() => [] as TripListItem[]);
   const hosted = trips.filter((t) => t.host_id === user.id);
   const joined = trips.filter((t) => t.host_id !== user.id);

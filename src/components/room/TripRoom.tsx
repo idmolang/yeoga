@@ -40,7 +40,7 @@ export default function TripRoom({ tripId, me, created }: { tripId: string; me: 
 
   const room = useMemo<Room | null>(() => {
     if (!data) return null;
-    const names = new Map(data.members.map((m) => [m.user_id, m.display_name]));
+    const names = new Map([...data.members, ...data.withdrawn].map((m) => [m.user_id, m.display_name]));
     return {
       data,
       supabase,

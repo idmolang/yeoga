@@ -27,11 +27,16 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               여가
             </Link>
             {user && (
-              <form action="/auth/signout" method="post">
-                <button type="submit" className="rounded-lg px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
-                  로그아웃
-                </button>
-              </form>
+              <nav className="flex items-center gap-1 text-sm text-slate-500">
+                <Link href="/me" className="rounded-lg px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800">
+                  내 정보
+                </Link>
+                <form action="/auth/signout" method="post">
+                  <button type="submit" className="rounded-lg px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    로그아웃
+                  </button>
+                </form>
+              </nav>
             )}
           </div>
         </header>

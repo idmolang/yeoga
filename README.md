@@ -32,7 +32,8 @@ Next.js 16 (App Router, `proxy.ts`) · React 19 · TypeScript · Tailwind CSS 4 
 
 ```
 supabase/
-└─ schema.sql              # 테이블·RLS 정책·RPC 함수·Realtime 등록 (SQL Editor에 붙여넣기)
+├─ schema.sql              # 테이블·RLS 정책·RPC 함수·Realtime 등록 (새 DB는 이것만 실행)
+└─ migrations/             # 이미 만든 DB를 최신으로 올리는 SQL (예: 2026-10-members.sql 회원 기능)
 src/
 ├─ proxy.ts                # 요청마다 로그인 세션 갱신 (Next 16의 middleware)
 ├─ app/
@@ -94,6 +95,7 @@ src/
 
 1. Supabase 대시보드 → 왼쪽 **SQL Editor** → **New query**
 2. `supabase/schema.sql` 내용을 전부 붙여넣고 **Run**
+   (이미 DB가 있다면 schema.sql 대신 `supabase/migrations/`의 SQL을 날짜순으로 실행)
 3. 왼쪽 **Table Editor**에 `trips`, `members` 등 12개 테이블이 보이면 성공
 
 여러 번 실행해도 안전합니다 (스키마를 고친 뒤 다시 실행하면 됨).

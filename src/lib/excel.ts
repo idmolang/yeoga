@@ -48,7 +48,7 @@ export async function exportRoomToExcel(data: RoomData) {
   const { trip, members, responses, options, votes } = data;
   const wb = XLSX.utils.book_new();
   const add = (name: string, ws: ReturnType<typeof toSheet>) => XLSX.utils.book_append_sheet(wb, ws, name);
-  const nameOf = (id: string | null) => (id ? (members.find((m) => m.user_id === id)?.display_name ?? "나간 사람") : "");
+  const nameOf = (id: string | null) => (id ? ([...members, ...data.withdrawn].find((m) => m.user_id === id)?.display_name ?? "나간 사람") : "");
   const c = coordinate(data);
   const stage = stageOf(trip, responses.length);
   const confirmed = trip.status === "confirmed";

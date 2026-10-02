@@ -2,13 +2,15 @@
 
 import { redirect } from "next/navigation";
 import CreateTripForm from "@/components/CreateTripForm";
-import { nicknameOf } from "@/lib/auth";
-import { getUser } from "@/lib/supabase/server";
+import { requireProfile } from "@/lib/profile";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "방 만들기" };
 
 export default async function NewTripPage() {
-  const user = await getUser();
-  if (!user) redirect("/login?next=/new");
-  return <CreateTripForm defaultHostName={nicknameOf(user)} />;
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) redirect("/login?next=/new");
+  const profile = await requireProfile(supabase, data.user, "/new");
+  return <CreateTripForm defaultHostName={profile.name} />;
 }

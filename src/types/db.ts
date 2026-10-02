@@ -33,7 +33,16 @@ export interface MemberRow {
   user_id: string;
   display_name: string;
   going: boolean;
+  withdrawn: boolean; // 탈퇴한 사용자 (display_name 은 '탈퇴한 사용자')
   joined_at: string;
+}
+
+export interface ProfileRow {
+  user_id: string;
+  name: string;
+  avatar_url: string | null;
+  consented_at: string;
+  created_at: string;
 }
 
 export interface ResponseRow {
@@ -136,7 +145,10 @@ export interface PackingRow {
 /** 여행방 하나의 모든 데이터 (화면·엑셀이 이것 하나를 본다) */
 export interface RoomData {
   trip: TripRow;
+  /** 지금 참여 중인 사람 */
   members: MemberRow[];
+  /** 탈퇴했지만 지출·정산 기록에 남아 이름만 보여주는 사람 */
+  withdrawn: MemberRow[];
   responses: ResponseRow[];
   options: OptionRow[];
   votes: VoteRow[];

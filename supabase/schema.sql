@@ -43,12 +43,27 @@ create table if not exists public.trips (
 
 create table if not exists public.members (
   trip_id uuid not null references public.trips (id) on delete cascade,
-  user_id uuid not null references auth.users (id) on delete cascade,
+  -- auth.users FK 를 걸지 않는다: 탈퇴해도 지출·정산 기록이 이 사람을 가리키므로 행을 남겨야 한다
+  user_id uuid not null,
   display_name text not null check (char_length(display_name) between 1 and 10),
   going boolean not null default true, -- 확정 때 참여 인원으로 고른 사람
+  withdrawn boolean not null default false, -- 탈퇴한 사용자 (이름은 '탈퇴한 사용자'로 바뀐다)
   joined_at timestamptz not null default now(),
-  primary key (trip_id, user_id),
-  unique (trip_id, display_name)
+  primary key (trip_id, user_id)
+);
+
+-- 같은 방 안에서 표시 이름 중복 금지 (탈퇴한 사용자는 여럿일 수 있다)
+create unique index if not exists members_unique_name on public.members (trip_id, display_name)
+  where not withdrawn;
+
+-- 회원 프로필: 첫 로그인 때 "여가에서 쓸 이름"과 개인정보 안내 동의를 받아 만든다.
+-- 행이 있으면 온보딩을 마친 사람이다. 받는 정보는 닉네임·프로필 사진뿐 (/privacy)
+create table if not exists public.profiles (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  name text not null check (char_length(name) between 1 and 10),
+  avatar_url text check (avatar_url ~ '^https://'),
+  consented_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
 );
 
 create table if not exists public.responses (
@@ -128,7 +143,7 @@ create table if not exists public.expenses (
   category text not null check (category in ('transport', 'lodging', 'food', 'tour', 'etc')),
   amount integer not null check (amount >= 1),
   kind text not null check (kind in ('plan', 'actual')),
-  paid_by uuid references auth.users (id) on delete set null,
+  paid_by uuid, -- 탈퇴한 사람도 가리킬 수 있게 FK 없음 (members 의 withdrawn 행으로 표시)
   shared_with uuid[] not null default '{}',
   created_at timestamptz not null default now(),
   check (kind = 'plan' or (paid_by is not null and cardinality(shared_with) >= 1))
@@ -138,8 +153,8 @@ create table if not exists public.expenses (
 create table if not exists public.settlements (
   id uuid primary key default gen_random_uuid(),
   trip_id uuid not null references public.trips (id) on delete cascade,
-  from_id uuid not null references auth.users (id) on delete cascade,
-  to_id uuid not null references auth.users (id) on delete cascade,
+  from_id uuid not null, -- FK 없음: 탈퇴한 사람도 가리킬 수 있게
+  to_id uuid not null,
   amount integer not null check (amount >= 1),
   done boolean not null default false,
   unique (trip_id, from_id, to_id, amount)
@@ -222,6 +237,7 @@ $$;
 
 alter table public.trips enable row level security;
 alter table public.members enable row level security;
+alter table public.profiles enable row level security;
 alter table public.responses enable row level security;
 alter table public.destination_options enable row level security;
 alter table public.destination_votes enable row level security;
@@ -243,6 +259,19 @@ create policy "trips: 방장 수정" on public.trips for update to authenticated
 drop policy if exists "trips: 방장 삭제" on public.trips;
 create policy "trips: 방장 삭제" on public.trips for delete to authenticated
   using (host_id = (select auth.uid()));
+
+-- profiles: 내 프로필만 읽고 만들고 이름 수정. 삭제는 탈퇴 함수(delete_account)가 한다
+drop policy if exists "profiles: 내 프로필 읽기" on public.profiles;
+create policy "profiles: 내 프로필 읽기" on public.profiles for select to authenticated
+  using (user_id = (select auth.uid()));
+drop policy if exists "profiles: 내 프로필 만들기" on public.profiles;
+create policy "profiles: 내 프로필 만들기" on public.profiles for insert to authenticated
+  with check (user_id = (select auth.uid()));
+drop policy if exists "profiles: 내 이름 수정" on public.profiles;
+create policy "profiles: 내 이름 수정" on public.profiles for update to authenticated
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+revoke update on public.profiles from anon, authenticated;
+grant update (name) on public.profiles to authenticated;
 
 -- members: 같은 방끼리 읽기, 자기 표시 이름만 수정, 나가기는 본인(방장 제외) 또는 방장이 내보내기
 drop policy if exists "members: 같은 방 읽기" on public.members;
@@ -446,7 +475,7 @@ begin
   if exists (select 1 from public.members where trip_id = v_trip and user_id = v_uid) then
     return v_trip;
   end if;
-  if exists (select 1 from public.members where trip_id = v_trip and display_name = trim(p_display_name)) then
+  if exists (select 1 from public.members where trip_id = v_trip and display_name = trim(p_display_name) and not withdrawn) then
     raise exception '이미 같은 이름의 참여자가 있어요' using errcode = '23505';
   end if;
   insert into public.members (trip_id, user_id, display_name) values (v_trip, v_uid, trim(p_display_name));
@@ -507,15 +536,75 @@ begin
   on conflict do nothing;
 end $$;
 
+-- 회원 탈퇴: 로그인한 본인 계정을 지운다.
+--   p_hosted: 내가 방장인 방마다 처리 방법. {"<trip_id>": "delete" | "<새 방장 user_id>"}
+--   - 방장인 방: 삭제하거나, 같은 방의 다른 참여자에게 방장을 넘긴다 (빠짐없이 정해야 함)
+--   - 내 응답·여행지 투표·의견·좋아요·개인 준비물은 삭제
+--   - 지출·정산 기록에 이름이 나오는 방은 참여자 행을 '탈퇴한 사용자'로 남기고, 아니면 참여자 행도 삭제
+create or replace function public.delete_account(p_hosted jsonb default '{}') returns void
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_uid uuid := auth.uid();
+  v_trip record;
+  v_choice text;
+begin
+  if v_uid is null then
+    raise exception '로그인이 필요해요' using errcode = '42501';
+  end if;
+
+  for v_trip in select id, name from public.trips where host_id = v_uid loop
+    v_choice := p_hosted ->> v_trip.id::text;
+    if v_choice is null then
+      raise exception '"%" 방을 삭제할지, 다른 참여자에게 방장을 넘길지 정해 주세요', v_trip.name;
+    elsif v_choice = 'delete' then
+      delete from public.trips where id = v_trip.id;
+    else
+      if not exists (
+        select 1 from public.members
+        where trip_id = v_trip.id and user_id::text = v_choice and user_id <> v_uid and not withdrawn
+      ) then
+        raise exception '"%" 방의 새 방장은 같은 방의 다른 참여자여야 해요', v_trip.name;
+      end if;
+      update public.trips set host_id = v_choice::uuid where id = v_trip.id;
+    end if;
+  end loop;
+
+  delete from public.responses where user_id = v_uid;
+  delete from public.destination_votes where user_id = v_uid;
+  delete from public.slot_comments where user_id = v_uid;
+  delete from public.slot_likes where user_id = v_uid;
+  delete from public.packing_items where owner_id = v_uid;
+
+  -- 지출·정산에 이름이 남는 방은 '탈퇴한 사용자'로 남기고, 아니면 참여자 행을 지운다
+  update public.members m
+  set display_name = '탈퇴한 사용자', withdrawn = true
+  where m.user_id = v_uid and (
+    exists (
+      select 1 from public.expenses e
+      where e.trip_id = m.trip_id and (e.paid_by = v_uid or v_uid = any (e.shared_with))
+    )
+    or exists (
+      select 1 from public.settlements s
+      where s.trip_id = m.trip_id and (s.from_id = v_uid or s.to_id = v_uid)
+    )
+  );
+  delete from public.members where user_id = v_uid and not withdrawn;
+
+  -- 프로필 등 auth.users 를 가리키는 나머지는 cascade 로 함께 지워진다
+  delete from auth.users where id = v_uid;
+end $$;
+
 -- 함수 실행 권한: 로그인한 사용자만
 revoke execute on function public.create_trip(text, text, text, date, date, boolean, text, text[], date) from public, anon;
 revoke execute on function public.trip_preview(text) from public, anon;
 revoke execute on function public.join_trip(text, text) from public, anon;
 revoke execute on function public.confirm_trip(uuid, jsonb) from public, anon;
+revoke execute on function public.delete_account(jsonb) from public, anon;
 grant execute on function public.create_trip(text, text, text, date, date, boolean, text, text[], date) to authenticated;
 grant execute on function public.trip_preview(text) to authenticated;
 grant execute on function public.join_trip(text, text) to authenticated;
 grant execute on function public.confirm_trip(uuid, jsonb) to authenticated;
+grant execute on function public.delete_account(jsonb) to authenticated;
 
 -- ───────────────────────── Realtime ─────────────────────────
 -- 다른 참여자의 변경을 바로 받기 위해 Realtime 발행 목록에 추가 (이미 있으면 건너뜀)

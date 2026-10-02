@@ -1,5 +1,6 @@
 // 로그인: 구글·카카오 소셜 로그인. ?next= 로 로그인 후 돌아갈 주소를 받는다 (초대 링크 등)
 
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import LoginButtons from "@/components/LoginButtons";
 import { h1, muted } from "@/components/styles";
@@ -28,6 +29,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       )}
       <LoginButtons next={next} />
       <p className={`text-center ${muted}`}>이메일·연락처는 받지 않아요. 이름은 소셜 닉네임을 쓰고, 방마다 바꿀 수 있어요.</p>
+      <p className={`text-center ${muted}`}>
+        <Link href="/privacy" className="underline">
+          개인정보 안내
+        </Link>
+        {" "}· 첫 로그인 때 동의를 받아요.
+      </p>
     </div>
   );
 }

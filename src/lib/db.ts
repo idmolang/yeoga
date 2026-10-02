@@ -2,7 +2,7 @@
 // (v0.1 storage.ts 의 역할. 화면 코드는 여기 함수만 부르고, 권한은 DB의 RLS가 지킨다)
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { RoomData, TripPreview, TripRow } from "@/types/db";
+import type { MemberRow, RoomData, TripPreview, TripRow } from "@/types/db";
 
 type DB = SupabaseClient;
 
@@ -101,9 +101,11 @@ export async function loadRoom(db: DB, tripId: string): Promise<RoomData> {
       byTrip("settlements"),
       byTrip("packing_items").order("created_at"),
     ]);
+  const everyone = (check(members) ?? []) as MemberRow[];
   return {
     trip: check(trip),
-    members: check(members) ?? [],
+    members: everyone.filter((m) => !m.withdrawn),
+    withdrawn: everyone.filter((m) => m.withdrawn),
     responses: check(responses) ?? [],
     options: check(options) ?? [],
     votes: check(votes) ?? [],
@@ -115,6 +117,22 @@ export async function loadRoom(db: DB, tripId: string): Promise<RoomData> {
     settlements: check(settlements) ?? [],
     packing: check(packing) ?? [],
   } as RoomData;
+}
+
+// ───────── 회원 ─────────
+
+/** 온보딩: 이름 확인 + 개인정보 안내 동의 (consented_at 은 DB가 지금 시각으로 채운다) */
+export async function createProfile(db: DB, userId: string, name: string, avatarUrl: string | null) {
+  check(await db.from("profiles").insert({ user_id: userId, name, avatar_url: avatarUrl }));
+}
+
+export async function renameProfile(db: DB, userId: string, name: string) {
+  check(await db.from("profiles").update({ name }).eq("user_id", userId));
+}
+
+/** 회원 탈퇴. hosted: 내가 방장인 방마다 "delete" 또는 새 방장의 user_id */
+export async function deleteAccount(db: DB, hosted: Record<string, string>) {
+  check(await db.rpc("delete_account", { p_hosted: hosted }));
 }
 
 // ───────── 방장 전용 ─────────

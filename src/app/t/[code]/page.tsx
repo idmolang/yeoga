@@ -7,8 +7,8 @@ import { redirect } from "next/navigation";
 import JoinCard from "@/components/room/JoinCard";
 import TripRoom from "@/components/room/TripRoom";
 import { h1, muted, primaryButton } from "@/components/styles";
-import { nicknameOf } from "@/lib/auth";
 import { previewTrip } from "@/lib/db";
+import { requireProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function TripPage({ params, searchParams }: PageProps<"/t/[code]">) {
@@ -18,6 +18,7 @@ export default async function TripPage({ params, searchParams }: PageProps<"/t/[
   const { data } = await supabase.auth.getUser();
   const user = data.user;
   if (!user) redirect(`/login?next=${encodeURIComponent(`/t/${code}`)}`);
+  const profile = await requireProfile(supabase, user, `/t/${code}`);
 
   const preview = await previewTrip(supabase, code).catch(() => null);
   if (!preview) {
@@ -30,7 +31,7 @@ export default async function TripPage({ params, searchParams }: PageProps<"/t/[
     );
   }
 
-  if (!preview.is_member) return <JoinCard code={code} preview={preview} defaultName={nicknameOf(user)} />;
+  if (!preview.is_member) return <JoinCard code={code} preview={preview} defaultName={profile.name} />;
 
   return <TripRoom key={preview.id} tripId={preview.id} me={user.id} created={created === "1"} />;
 }
