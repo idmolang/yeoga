@@ -21,13 +21,9 @@ export async function GET() {
   const { error } = await supabase.rpc("health_check");
 
   if (error) {
-    // 실패 응답은 캐시하지 않는다 — 모니터링이 장애를 바로 봐야 한다.
     console.error("[health] supabase query failed:", error.message);
     return NextResponse.json({ status: "error" }, { status: 500 });
   }
 
-  return NextResponse.json(
-    { status: "ok", checkedAt: new Date().toISOString() },
-    { headers: { "Cache-Control": "public, max-age=0, s-maxage=60" } },
-  );
+  return NextResponse.json({ status: "ok", checkedAt: new Date().toISOString() });
 }
