@@ -42,6 +42,11 @@ export default async function HomePage() {
         <Link href="/login?next=/new" className={bigButton}>
           로그인하고 시작하기
         </Link>
+        <p className={`text-center ${muted}`}>
+          <Link href="/privacy" className="underline">
+            개인정보 안내
+          </Link>
+        </p>
       </div>
     );
   }
@@ -64,6 +69,12 @@ export default async function HomePage() {
 
       <TripSection title="내가 만든 방" trips={hosted} empty="아직 만든 방이 없어요." />
       <TripSection title="참여한 방" trips={joined} empty="초대 링크로 참여한 방이 여기에 보여요." />
+
+      <p className={`text-center ${muted}`}>
+        <Link href="/privacy" className="underline">
+          개인정보 안내
+        </Link>
+      </p>
     </div>
   );
 }
