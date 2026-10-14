@@ -30,6 +30,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // 정적 파일·이미지는 건너뛴다
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // 정적 파일·이미지·헬스체크(크론·외부 모니터링용, 로그인과 무관)는 건너뛴다
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|api/health|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
