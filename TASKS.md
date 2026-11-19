@@ -78,6 +78,14 @@
 - [ ] **비용표 숫자 채우기**: PRD 9장 비용표에 현재 사용량, 확인 방법, 멈춤선 추가. 매월 1일 Supabase·Vercel 대시보드 확인
   - 개발자가 대시보드에서 사용량 확인 후 숫자와 멈춤선 금액 결정
 
+### 버그: 신규 가입자 온보딩 저장 실패 (profiles 테이블 미적용)
+
+- 증상: 신규 가입자가 `/onboarding`에서 동의 체크 후 제출하면 일반 오류 문구("저장하지 못했어요")가 뜬다. 구글 사용자는 정상(이미 온보딩 마침).
+- **원인 확정** (개발자가 Network 탭으로 직접 확인): `profiles` INSERT 응답이 `{"code":"PGRST205","message":"Could not find the table 'public.profiles' in the schema cache"}`. 커밋 5342efc가 `supabase/schema.sql`과 `supabase/migrations/2026-10-members.sql`에는 `profiles` 테이블·정책을 추가했지만, 그 SQL이 실제 Supabase DB에는 실행되지 않은 것으로 보인다.
+- 확인용 읽기 전용 SQL: `supabase/check_5342efc_applied.sql` (테이블/함수/RLS 정책 목록 조회 + 5342efc가 추가한 객체 목록과 대조)
+- 적용용 SQL 초안(검토용, 실행 금지): `supabase/fix_missing_5342efc_objects.sql` — profiles 테이블·정책·권한, members.withdrawn 컬럼, join_trip·delete_account 함수를 "없으면 만든다" 방식으로만 작성(drop/delete/truncate/alter...drop 없음). 표가 있는데 인식 못 하는 경우를 위한 `NOTIFY pgrst, 'reload schema';`도 별도로 포함.
+- 개발자가 Supabase SQL Editor에서 확인·실행 예정. 코드·DB·RLS·환경변수는 이 조사에서 건드리지 않음.
+
 ### 재판 기록에서 발견
 
 - [ ] PRD 11장에 일시정지 기준 일수(Supabase 문서 확인)와 복구 절차 추가: 장애 메일 → 대시보드 확인 → Restore → `/api/health` 확인
@@ -93,6 +101,30 @@
 - [ ] Vercel의 안 쓰는 `CRON_SECRET` 환경변수 삭제 (선택)
 - [ ] `.env.local`의 publishable 키 채우기 (로컬 테스트용, 급하지 않음)
 
+### 디자인 개선 (toss.md 시각 언어 + 푸른 하늘 강조색 세트 B) — 구현 완료, 휴대폰 확인 대기
+
+- 범위: 디자인 토큰·공통 컴포넌트·스크롤 등장 애니메이션만. 화면 배치·기능·문구는 바꾸지 않았다. 토스·대한항공 브랜드 자산은 쓰지 않았다.
+- 결정: 색 세트 B, Pretendard는 jsdelivr 동적 서브셋(display swap, 실패 시 시스템 글꼴), 본문 15px(input·textarea·select는 16px 이상).
+- 커밋(단계별로 되돌릴 수 있음):
+  - 1단계 `1bcdfee` 토큰(색·라운드·모션) 정의 + Pretendard CDN
+  - 2단계 `6ada3b0` 공통 스타일(`styles.ts`): 버튼 M/L/XL·눌림 overlay·비활성 0.30, 입력칸 48px, 카드, 선택 카드, 배지, 체크박스·라디오(input 유지, 모양만 변경), 글자 단계
+  - 3단계 `f24d051` 개별 컴포넌트·잔여 클래스 정리(slate/sky 0건, 중복 `dark:` 제거)
+  - 4단계 `756da0c` 스크롤 등장 애니메이션 `Reveal`(CSS + IntersectionObserver)
+  - 5단계 최종 점검 + TASKS 갱신(이 커밋)
+- 계획과 달라진 점:
+  - 흐린 글자색은 `#6B7684` 대신 `#646F7D`(회색 바탕 위 AA 4.5:1 확보). 체크박스·라디오 테두리는 `#8B95A1`/다크 `#7E7E87`(비텍스트 3:1).
+  - 1단계에서 라운드 이름을 바꿔 기존 `rounded-*` 값이 어긋났던 것을 2단계에서 바로잡음(sm4·md8·lg12·xl16·2xl20·3xl24).
+  - 날짜 히트맵은 흰 글자 대비를 맞추려고 농도 구간을 둘로 나눔(60% 미만은 옅게, 이상은 진하게). 색 구간이 이전보다 뚜렷하다.
+  - 로그인 버튼 비활성은 눌린 버튼은 그대로, 다른 버튼만 0.30. 카카오 노란색은 브랜드 규정 색이라 유지.
+  - 4px 단위가 아닌 간격(`py-2.5`, `px-1.5` 등)은 레이아웃이 바뀔 수 있어 정리하지 않았다.
+  - Reveal은 준비 탭(할 일·일정 등) 목록에는 적용하지 않았다(편집이 잦고 탭 전환 내용은 제외하기로 한 범위). 첫 화면, 내 정보, 개인정보 안내, 조율 현황 카드, 참여자 카드에만 적용.
+- 알려진 한계:
+  - 입력칸 테두리(`#E5E8EB`)는 토스 규격 그대로라 배경 대비 3:1에 못 미친다(회색 바탕 + 포커스 시 강조 테두리로 보완). 필요하면 테두리를 진하게 조정.
+  - 로컬에는 Supabase 환경변수가 없어 앱 화면을 직접 띄워 보지 못했다. Reveal은 같은 CSS·로직의 독립 페이지로 동작을 확인했고(숨김 → 진입 시 페이드, 한 번만), 실제 화면은 배포본에서 확인해야 한다.
+  - 다크 모드의 일부 빨강·황록 배지는 기존 Tailwind 색(`dark:` 쌍)을 그대로 쓴다.
+- [ ] 개발자 휴대폰 확인 (라이트/다크, 아래 화면 목록)
+- 확인할 화면: `/`(로그인 전·후), `/login`, `/onboarding`, `/new`(체크·라디오·입력), `/me`, `/privacy`, `/t/초대코드`(응답하기·조율 현황·확정하기·준비 탭 5개)
+
 ## 보류
 
 - 아이디어팀: 비지인 그룹 테스트 결과가 나온 뒤 필요하면 만든다. 후보는 기존 PRD 에이전트 채팅.
@@ -100,7 +132,7 @@
 ## 결정 사항
 
 - 헬스체크에 service_role 키와 URL 토큰은 쓰지 않는다.
-- 헬스체크는 테이블 권한에 의존하지 않는 RPC 함수로 한다. (이전 기록의 "profiles 테이블은 존재하지 않는다"는 anon 역할에 테이블 접근 권한이 없던 문제를 잘못 기록한 것이다. profiles 테이블은 supabase/schema.sql에 정의되어 있다.)
+- 헬스체크는 테이블에 의존하지 않는 RPC 함수로 한다. (profiles 테이블은 schema.sql에 정의돼 있지만 실제 DB에는 적용되지 않았다. 2026-10-14 온보딩 PGRST205 오류로 확인)
 - 헬스체크 주소는 공개로 두되 상태 정보만 반환한다.
 - `/api/health`에 60초 캐시 헤더 시도 → 철회. `dynamic = "force-dynamic"` 라우트는 Next.js 16이 Cache-Control을 `private, no-cache, no-store, max-age=0, must-revalidate`로 무조건 덮어써서 커스텀 헤더가 안 먹힌다. 실제로 캐시를 켜려면 `revalidate = 60`으로 바꿔야 하는데, 그러면 실패 응답까지 60초 캐시돼 장애 감지가 늦어진다. 호출 빈도(크론 1일 1회, UptimeRobot 5분)가 이미 60초보다 훨씬 길어 캐시의 실익이 작아서, 즉시 장애 감지를 포기하지 않기로 했다.
 
