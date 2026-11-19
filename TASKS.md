@@ -125,6 +125,14 @@
 - [ ] 개발자 휴대폰 확인 (라이트/다크, 아래 화면 목록)
 - 확인할 화면: `/`(로그인 전·후), `/login`, `/onboarding`, `/new`(체크·라디오·입력), `/me`, `/privacy`, `/t/초대코드`(응답하기·조율 현황·확정하기·준비 탭 5개)
 
+### 디자인 2차: 화면 배치 개편 (브랜치 `design-layout`, main 미병합) — 1차 완료, 개발자 확인 대기
+
+- 방향: toss.im 웹사이트 느낌. 첫 화면 큰 섹션(44~56px 제목), 하단 고정 버튼(BottomCTA), 한 화면 한 질문, 목록 행, 빈 상태, 아래에서 올라오는 시트. 기능·데이터·DB·환경변수·로그인 설정·응답 문항은 그대로.
+- 1차(커밋 `design-layout` 브랜치): 첫 화면(`/`), 응답하기(`ResponseForm`), 조율 현황(`Dashboard`) + 공통 `BottomCTA`·`EmptyState`·`BottomSheet`·`Intro`(처음 열릴 때 순서 등장) + `Reveal` lg(600ms)
+- 미리보기: https://yeoga-cqi1vd9uu-idmolang.vercel.app
+- [ ] 개발자 확인 후 "다음" → 2차: `/login`, `/onboarding`, `/new`, 확정 화면, 준비 탭, `/me`, `/privacy`
+- [ ] main 병합은 개발자 승인 후
+
 ## 보류
 
 - 아이디어팀: 비지인 그룹 테스트 결과가 나온 뒤 필요하면 만든다. 후보는 기존 PRD 에이전트 채팅.
