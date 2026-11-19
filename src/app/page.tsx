@@ -20,7 +20,7 @@ export default async function HomePage() {
       <div className="space-y-10 pt-6">
         <section className="space-y-3">
           <h1 className="text-3xl font-extrabold tracking-tight">다같이 여행가자!</h1>
-          <p className="text-base text-slate-600 dark:text-slate-300">
+          <p className="text-base text-text-secondary">
             단톡방에서 날짜·예산 맞추다 지치지 마세요. 여가가 사람을 모으고, 다 같이 정하고, 함께 준비하게 도와줘요.
           </p>
         </section>
@@ -30,8 +30,8 @@ export default async function HomePage() {
             ["조율", "각자 가능한 날짜·예산·스타일을 답하면 자동으로 모아 보여줘요."],
             ["준비", "방장이 확정하면 할 일·일정·예산·준비물이 만들어지고, 같이 고치고 정산해요."],
           ].map(([title, desc], i) => (
-            <li key={title} className="flex gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-sky-700 text-sm font-bold text-white">{i + 1}</span>
+            <li key={title} className="flex gap-3 rounded-xl bg-surface p-4 ring-1 ring-line">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">{i + 1}</span>
               <span>
                 <span className="block font-semibold">{title}</span>
                 <span className={muted}>{desc}</span>
@@ -93,7 +93,7 @@ function TripSection({ title, trips, empty }: { title: string; trips: TripListIt
               <li key={t.id}>
                 <Link
                   href={`/t/${t.invite_code}`}
-                  className="block space-y-1.5 rounded-2xl bg-white p-4 ring-1 ring-slate-200 transition hover:ring-sky-400 dark:bg-slate-900 dark:ring-slate-800"
+                  className="block space-y-1.5 rounded-xl bg-surface p-4 ring-1 ring-line transition-colors duration-(--dur-base) hover:ring-brand-500"
                 >
                   <span className="flex items-start justify-between gap-2">
                     <span className="font-semibold">{t.name}</span>
@@ -105,7 +105,7 @@ function TripSection({ title, trips, empty }: { title: string; trips: TripListIt
                     <span>{t.destination ?? "여행지 미정"}</span>
                     <span>{t.start_date && t.end_date ? formatRange(t.start_date, t.end_date) : `후보 ${formatRange(t.window_start, t.window_end)}`}</span>
                     <span>{t.members[0]?.count ?? 0}명</span>
-                    <span className="font-semibold text-sky-700 dark:text-sky-300">{ddayText(t)}</span>
+                    <span className="font-semibold text-brand-text">{ddayText(t)}</span>
                   </span>
                 </Link>
               </li>

@@ -11,13 +11,13 @@ const PROVIDERS: { id: Provider; label: string; className: string }[] = [
   {
     id: "kakao",
     label: "카카오로 시작하기",
-    className: "bg-[#FEE500] text-[#191919] hover:brightness-95",
+    className: "bg-[#FEE500] text-[#191919] hover:brightness-95 active:brightness-90",
   },
   {
     id: "google",
     label: "구글로 시작하기",
     className:
-      "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800",
+      "border border-line bg-surface text-foreground hover:bg-surface-sunken active:bg-line",
   },
 ];
 
@@ -44,7 +44,7 @@ export default function LoginButtons({ next }: { next: string }) {
           type="button"
           onClick={() => login(p.id)}
           disabled={pending !== null}
-          className={`flex w-full items-center justify-center rounded-xl px-4 py-3.5 text-base font-semibold transition disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 ${p.className}`}
+          className={`flex min-h-12 w-full items-center justify-center rounded-xl px-5 text-[17px] font-bold transition-colors duration-(--dur-fast) ease-(--ease) disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${pending !== null && pending !== p.id ? "opacity-30" : ""} ${p.className}`}
         >
           {pending === p.id ? "이동하는 중…" : p.label}
         </button>

@@ -181,7 +181,7 @@ function ResponseSteps({
           <div className="space-y-4">
             <input
               type="range"
-              className="w-full accent-sky-600"
+              className="w-full accent-brand-600"
               min={50000}
               max={5000000}
               step={10000}
@@ -239,7 +239,7 @@ function ResponseSteps({
               {proposals.map((name) => (
                 <label key={name} className={choice}>
                   <input type="checkbox" name="proposals" checked onChange={() => setProposals(proposals.filter((p) => p !== name))} />
-                  {name} <span className="text-xs text-sky-700 dark:text-sky-300">내 제안</span>
+                  {name} <span className="text-xs text-brand-text">내 제안</span>
                 </label>
               ))}
             </div>

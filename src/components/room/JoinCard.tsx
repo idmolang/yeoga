@@ -37,7 +37,7 @@ export default function JoinCard({ code, preview, defaultName }: { code: string;
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <p className="text-sm font-medium text-sky-700 dark:text-sky-300">
+        <p className="text-sm font-medium text-brand-text">
           {preview.host_name ?? "친구"}님이 여행에 초대했어요
         </p>
         <h1 className={h1}>{preview.name}</h1>

@@ -56,7 +56,7 @@ export default function OnboardingForm({
           <span className="flex items-center gap-3">
             {avatarUrl && (
               // eslint-disable-next-line @next/next/no-img-element -- 소셜 계정의 외부 프로필 사진
-              <img src={avatarUrl} alt="" referrerPolicy="no-referrer" className="size-11 shrink-0 rounded-full bg-slate-200 object-cover" />
+              <img src={avatarUrl} alt="" referrerPolicy="no-referrer" className="size-11 shrink-0 rounded-full bg-line object-cover" />
             )}
             <input
               {...v.field("name")}
@@ -75,13 +75,13 @@ export default function OnboardingForm({
 
       <div className={`${subtleBox} space-y-1`}>
         <p className="font-semibold">개인정보 수집·이용 안내</p>
-        <ul className="list-inside list-disc space-y-0.5 text-slate-600 dark:text-slate-300">
+        <ul className="list-inside list-disc space-y-0.5 text-text-secondary">
           <li>받는 정보: 닉네임, 프로필 사진</li>
           <li>사용 목적: 여행방 참여자 표시</li>
           <li>이메일·연락처는 받지 않아요. 탈퇴하면 삭제돼요.</li>
         </ul>
         <p>
-          <Link href="/privacy" target="_blank" className="font-medium text-sky-700 underline dark:text-sky-300">
+          <Link href="/privacy" target="_blank" className="font-medium text-brand-text underline">
             자세히 보기
           </Link>
         </p>

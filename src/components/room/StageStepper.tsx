@@ -10,15 +10,15 @@ export default function StageStepper({ stage }: { stage: Stage }) {
         const state = i < current ? "done" : i === current ? "now" : "next";
         return (
           <li key={s.id} className="flex items-center gap-1.5">
-            {i > 0 && <span className="text-slate-300 dark:text-slate-600" aria-hidden>→</span>}
+            {i > 0 && <span className="text-control" aria-hidden>→</span>}
             <span
               aria-current={state === "now" ? "step" : undefined}
               className={`rounded-full px-2.5 py-1 font-medium ${
                 state === "now"
-                  ? "bg-sky-700 text-white dark:bg-sky-600"
+                  ? "bg-brand-600 text-white"
                   : state === "done"
-                    ? "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200"
-                    : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
+                    ? "bg-brand-50 text-brand-text"
+                    : "bg-surface-sunken text-text-tertiary"
               }`}
             >
               {s.label}

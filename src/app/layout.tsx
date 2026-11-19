@@ -29,18 +29,18 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="flex min-h-full flex-col">
-        <header className="border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
+        <header className="border-b border-line bg-surface/80 backdrop-blur">
           <div className="mx-auto flex h-14 w-full max-w-2xl items-center justify-between px-4">
-            <Link href="/" className="text-xl font-extrabold tracking-tight text-sky-700 dark:text-sky-400">
+            <Link href="/" className="text-xl font-extrabold tracking-[-0.02em] text-brand-text">
               여가
             </Link>
             {user && (
-              <nav className="flex items-center gap-1 text-sm text-slate-500">
-                <Link href="/me" className="rounded-lg px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800">
+              <nav className="flex items-center gap-1 text-sm text-text-tertiary">
+                <Link href="/me" className="rounded-md px-2 py-1 transition-colors duration-(--dur-fast) hover:bg-surface-sunken">
                   내 정보
                 </Link>
                 <form action="/auth/signout" method="post">
-                  <button type="submit" className="rounded-lg px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800">
+                  <button type="submit" className="rounded-md px-2 py-1 transition-colors duration-(--dur-fast) hover:bg-surface-sunken">
                     로그아웃
                   </button>
                 </form>

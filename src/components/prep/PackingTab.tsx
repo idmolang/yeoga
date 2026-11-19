@@ -101,7 +101,7 @@ export default function PackingTab() {
           <h3 className={h3}>다른 사람 준비 현황</h3>
           <ul className="flex flex-wrap gap-2 text-sm">
             {others.map((o) => (
-              <li key={o.name} className="rounded-full bg-slate-100 px-3 py-1 dark:bg-slate-800">
+              <li key={o.name} className="rounded-full bg-surface-sunken px-3 py-1">
                 {o.name} {o.done}/{o.total}
               </li>
             ))}
@@ -130,20 +130,20 @@ function PackingList({
     <div className="space-y-3">
       <div>
         <h3 className={h3}>
-          {title} <span className="text-sm font-normal text-slate-500">{packed}/{items.length}</span>
+          {title} <span className="text-sm font-normal text-text-tertiary">{packed}/{items.length}</span>
         </h3>
         <p className={muted}>{hint}</p>
       </div>
       {items.length === 0 && <p className={muted}>아직 없어요.</p>}
       {groupPacking(items).map(([group, list]) => (
         <div key={group} className="space-y-1">
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{group}</p>
+          <p className="text-xs font-semibold text-text-tertiary">{group}</p>
           <ul>
             {list.map((item) => (
               <li key={item.id} className="flex items-center gap-3 px-1 py-1">
                 <label className="flex min-w-0 flex-1 items-center gap-3">
-                  <input type="checkbox" className="size-4" checked={item.packed} onChange={() => run(() => updateRow(supabase, "packing_items", item.id, { packed: !item.packed }))} />
-                  <span className={item.packed ? "text-slate-400 line-through" : ""}>{item.name}</span>
+                  <input type="checkbox"  checked={item.packed} onChange={() => run(() => updateRow(supabase, "packing_items", item.id, { packed: !item.packed }))} />
+                  <span className={item.packed ? "text-text-tertiary line-through" : ""}>{item.name}</span>
                 </label>
                 <button type="button" onClick={() => run(() => deleteRow(supabase, "packing_items", item.id))} className={deleteButton} aria-label={`${item.name} 삭제`}>
                   삭제

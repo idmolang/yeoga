@@ -22,7 +22,7 @@ export default function Tabs<T extends string>({
     document.getElementById(`tab-${next.id}`)?.focus();
   };
   return (
-    <div role="tablist" aria-label={label} className="flex gap-1 overflow-x-auto border-b border-slate-200 dark:border-slate-800">
+    <div role="tablist" aria-label={label} className="flex gap-1 overflow-x-auto border-b border-line">
       {tabs.map((t, i) => (
         <button
           key={t.id}
@@ -34,14 +34,14 @@ export default function Tabs<T extends string>({
           tabIndex={current === t.id ? 0 : -1}
           onClick={() => onChange(t.id)}
           onKeyDown={(e) => onKey(e, i)}
-          className={`shrink-0 border-b-2 px-3 py-2.5 text-sm transition ${
+          className={`shrink-0 border-b-[2.5px] px-3 py-2.5 text-sm transition-colors duration-(--dur-base) ease-(--ease) ${
             current === t.id
-              ? "border-sky-600 font-semibold text-sky-800 dark:text-sky-200"
-              : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+              ? "border-brand-600 font-semibold text-brand-text"
+              : "border-transparent text-text-tertiary hover:text-foreground"
           }`}
         >
           {t.label}
-          {t.badge !== undefined && t.badge !== "" && <span className="ml-1 text-xs text-slate-400">{t.badge}</span>}
+          {t.badge !== undefined && t.badge !== "" && <span className="ml-1 text-xs text-text-tertiary">{t.badge}</span>}
         </button>
       ))}
     </div>

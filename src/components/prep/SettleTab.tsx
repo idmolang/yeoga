@@ -43,12 +43,12 @@ export default function SettleTab() {
                 const mine = t.from === me || t.to === me;
                 return (
                   <li key={`${t.from}-${t.to}-${t.amount}`}>
-                    <label className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 ${mine ? "border-sky-300 dark:border-sky-800" : "border-slate-200 dark:border-slate-800"}`}>
-                      <input type="checkbox" className="size-4" checked={done} onChange={() => toggle(t.from, t.to, t.amount, !done)} />
-                      <span className={`min-w-0 flex-1 ${done ? "text-slate-400 line-through" : ""}`}>
+                    <label className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 ${mine ? "border-brand-500/40" : "border-line"}`}>
+                      <input type="checkbox"  checked={done} onChange={() => toggle(t.from, t.to, t.amount, !done)} />
+                      <span className={`min-w-0 flex-1 ${done ? "text-text-tertiary line-through" : ""}`}>
                         <strong>{nameOf(t.from)}</strong> → <strong>{nameOf(t.to)}</strong>
                       </span>
-                      <span className={`shrink-0 font-semibold ${done ? "text-slate-400" : ""}`}>{won(t.amount)}</span>
+                      <span className={`shrink-0 font-semibold ${done ? "text-text-tertiary" : ""}`}>{won(t.amount)}</span>
                     </label>
                   </li>
                 );
@@ -59,9 +59,9 @@ export default function SettleTab() {
 
           <div className="space-y-2">
             <h3 className={h3}>사람별 내역 (실제 지출 {won(result.total)})</h3>
-            <div className="overflow-hidden rounded-2xl ring-1 ring-slate-200 dark:ring-slate-800">
+            <div className="overflow-hidden rounded-xl ring-1 ring-line">
               <table className="w-full text-sm">
-                <thead className="bg-slate-100 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                <thead className="bg-surface-sunken text-xs text-text-tertiary">
                   <tr>
                     <th scope="col" className="px-3 py-2 text-left font-medium">이름</th>
                     <th scope="col" className="px-2 py-2 text-right font-medium">낸 돈</th>
@@ -69,13 +69,13 @@ export default function SettleTab() {
                     <th scope="col" className="px-3 py-2 text-right font-medium">차액</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
+                <tbody className="divide-y divide-line bg-surface">
                   {result.balances.map((b) => (
                     <tr key={b.userId}>
                       <th scope="row" className="px-3 py-2 text-left font-medium">{nameOf(b.userId)}</th>
                       <td className="px-2 py-2 text-right">{b.paid.toLocaleString("ko-KR")}</td>
                       <td className="px-2 py-2 text-right">{b.owed.toLocaleString("ko-KR")}</td>
-                      <td className={`px-3 py-2 text-right font-semibold ${b.diff > 0 ? "text-sky-700 dark:text-sky-300" : b.diff < 0 ? "text-red-600 dark:text-red-400" : ""}`}>
+                      <td className={`px-3 py-2 text-right font-semibold ${b.diff > 0 ? "text-brand-text" : b.diff < 0 ? "text-red-600 dark:text-red-400" : ""}`}>
                         {b.diff > 0 ? "+" : ""}
                         {b.diff.toLocaleString("ko-KR")}
                       </td>

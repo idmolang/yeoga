@@ -47,7 +47,7 @@ export default function ProfileForm({ userId, name, avatarUrl }: { userId: strin
           <span className="flex items-center gap-3">
             {avatarUrl && (
               // eslint-disable-next-line @next/next/no-img-element -- 소셜 계정의 외부 프로필 사진
-              <img src={avatarUrl} alt="" referrerPolicy="no-referrer" className="size-11 shrink-0 rounded-full bg-slate-200 object-cover" />
+              <img src={avatarUrl} alt="" referrerPolicy="no-referrer" className="size-11 shrink-0 rounded-full bg-line object-cover" />
             )}
             <input {...v.field("name")} type="text" className={input} required maxLength={10} value={value} onChange={(e) => setValue(e.target.value)} />
           </span>

@@ -39,8 +39,8 @@ export default function TripHeader({
           ["인원", people],
           ["1인 예산", budget],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-xl bg-white px-2 py-2.5 ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-            <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
+          <div key={label} className="rounded-lg bg-surface px-2 py-2.5 ring-1 ring-line">
+            <dt className="text-xs text-text-tertiary">{label}</dt>
             <dd className="text-sm font-semibold">{value}</dd>
           </div>
         ))}

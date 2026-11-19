@@ -180,7 +180,7 @@ export default function ConfirmForm({ c }: { c: Coordination }) {
               <input type="checkbox" name="going" checked={form.going.has(m.user_id)} onChange={() => toggleGoing(m.user_id)} aria-describedby={v.errorId("going")} />
               <span className="min-w-0">
                 {m.display_name}
-                {!c.responders.includes(m.user_id) && <span className="block text-xs text-slate-500">응답 안 함</span>}
+                {!c.responders.includes(m.user_id) && <span className="block text-xs text-text-tertiary">응답 안 함</span>}
               </span>
             </label>
           ))}

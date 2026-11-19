@@ -81,12 +81,12 @@ export default function BudgetTab() {
             <div key={category} className="space-y-1">
               <div className="flex flex-wrap justify-between gap-x-2 text-sm">
                 <span className="font-medium">{LABELS.budgetCategory[category]}</span>
-                <span className={over ? "text-red-600 dark:text-red-400" : "text-slate-500 dark:text-slate-400"}>
+                <span className={over ? "text-red-600 dark:text-red-400" : "text-text-tertiary"}>
                   {won(actual)} / {won(plan)}
                 </span>
               </div>
-              <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-800" aria-hidden>
-                <div className={`h-full rounded-full ${over ? "bg-red-500" : "bg-sky-600"}`} style={{ width: `${ratio * 100}%` }} />
+              <div className="h-1.5 rounded-full bg-line" aria-hidden>
+                <div className={`h-full rounded-full ${over ? "bg-red-500" : "bg-brand-500"}`} style={{ width: `${ratio * 100}%` }} />
               </div>
             </div>
           );
@@ -168,15 +168,15 @@ export default function BudgetTab() {
       <div className="space-y-2">
         <h3 className={h3}>전체 항목</h3>
         {expenses.length === 0 && <p className={muted}>항목이 없어요.</p>}
-        <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+        <ul className="divide-y divide-line">
           {sortExpenses(expenses).map((b) => (
             <li key={b.id} className="flex items-start gap-2 py-2.5 text-sm">
               <span className="min-w-0 flex-1">
-                <span className="text-slate-500 dark:text-slate-400">{LABELS.budgetCategory[b.category]} · </span>
+                <span className="text-text-tertiary">{LABELS.budgetCategory[b.category]} · </span>
                 {b.title}
                 <span className={`ml-2 ${badge} ${b.kind === "plan" ? badgeTone.gray : badgeTone.amber}`}>{KIND_LABEL[b.kind]}</span>
                 {b.kind === "actual" && (
-                  <span className="block text-xs text-slate-500 dark:text-slate-400">
+                  <span className="block text-xs text-text-tertiary">
                     {nameOf(b.paid_by)} 결제 · {b.shared_with.length === going.length ? "전원" : b.shared_with.map(nameOf).join(", ")} 함께
                   </span>
                 )}
@@ -195,10 +195,10 @@ export default function BudgetTab() {
 
 function Stat({ label, value, sub, warn }: { label: string; value: string; sub: string; warn?: boolean }) {
   return (
-    <div className="rounded-2xl bg-white p-3 ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+    <div className="rounded-xl bg-surface p-3 ring-1 ring-line">
+      <p className="text-xs text-text-tertiary">{label}</p>
       <p className={`text-lg font-bold ${warn ? "text-red-600 dark:text-red-400" : ""}`}>{value}</p>
-      <p className="text-xs text-slate-500 dark:text-slate-400">{sub}</p>
+      <p className="text-xs text-text-tertiary">{sub}</p>
     </div>
   );
 }

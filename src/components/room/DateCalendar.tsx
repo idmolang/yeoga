@@ -30,9 +30,9 @@ export default function DateCalendar(props: Props) {
             <p className="text-sm font-semibold">
               {y}년 {m}월
             </p>
-            <div className="grid grid-cols-7 gap-1 text-center text-xs text-slate-500 dark:text-slate-400" aria-hidden>
+            <div className="grid grid-cols-7 gap-1 text-center text-xs text-text-tertiary" aria-hidden>
               {WEEK.map((w, i) => (
-                <span key={w} className={i === 0 ? "text-red-500" : i === 6 ? "text-sky-600" : ""}>
+                <span key={w} className={i === 0 ? "text-red-600" : i === 6 ? "text-brand-text" : ""}>
                   {w}
                 </span>
               ))}
@@ -72,7 +72,7 @@ function SelectCell({
         aria-label={formatKDate(date)}
         aria-describedby={describedBy}
       />
-      <span className="flex aspect-square items-center justify-center rounded-lg border border-slate-200 text-sm font-medium transition peer-checked:border-sky-600 peer-checked:bg-sky-600 peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-1 peer-focus-visible:outline-sky-600 dark:border-slate-700 dark:peer-checked:bg-sky-500">
+      <span className="flex aspect-square items-center justify-center rounded-md border border-line bg-surface text-sm font-medium transition-colors duration-(--dur-fast) peer-checked:border-brand-600 peer-checked:bg-brand-600 peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-1 peer-focus-visible:outline-brand-500">
         {dayNum(date)}
       </span>
     </label>
@@ -83,19 +83,22 @@ function HeatCell({ date, counts, total, names }: Extract<Props, { mode: "heat" 
   const n = counts.get(date) ?? 0;
   const ratio = total > 0 ? n / total : 0;
   const all = total > 0 && n === total;
+  // 흰 글자는 진한 칸(60%↑)에서만 쓴다: 중간 농도에서 흰/검정 어느 쪽도 대비가 모자라서 농도 구간을 둘로 나눈다
+  const strong = ratio >= 0.6;
+  const alpha = strong ? 0.8 + ratio * 0.2 : 0.12 + ratio * 0.6;
   const who = names?.get(date) ?? [];
   const label = `${formatKDate(date)}: ${total}명 중 ${n}명 가능${who.length ? ` (${who.join(", ")})` : ""}`;
   return (
     <div
       title={label}
-      className={`flex aspect-square flex-col items-center justify-center rounded-lg bg-slate-100 text-xs leading-tight dark:bg-slate-800 ${
-        all ? "font-bold text-white ring-2 ring-sky-900 dark:ring-sky-300" : ratio >= 0.6 ? "text-white" : ""
-      }`}
-      style={{ backgroundColor: ratio > 0 ? `rgba(2, 132, 199, ${0.15 + ratio * 0.85})` : undefined }}
+      className={`flex aspect-square flex-col items-center justify-center rounded-md bg-surface-sunken text-xs leading-tight ${
+        strong ? "text-white" : ""
+      } ${all ? "font-bold ring-2 ring-brand-700 dark:ring-brand-500" : ""}`}
+      style={{ backgroundColor: ratio > 0 ? `rgba(23, 93, 138, ${alpha})` : undefined }}
     >
       <span className="sr-only">{label}</span>
       <span aria-hidden className="text-sm">{dayNum(date)}</span>
-      <span aria-hidden className={ratio > 0 ? "" : "text-slate-400"}>
+      <span aria-hidden className={ratio > 0 ? "" : "text-text-tertiary"}>
         {n}/{total}
       </span>
     </div>

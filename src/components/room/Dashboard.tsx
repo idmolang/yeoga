@@ -23,12 +23,12 @@ function Bar({ label, value, max, highlight, extra }: { label: string; value: nu
         <span className="font-medium">
           {label} {highlight && <span className={`${badge} ${badgeTone.sky} ml-1`}>반영</span>}
         </span>
-        <span className="shrink-0 text-slate-500 dark:text-slate-400">{value}명</span>
+        <span className="shrink-0 text-text-tertiary">{value}명</span>
       </div>
-      <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800" aria-hidden>
-        <div className={`h-full rounded-full ${highlight ? "bg-sky-600" : "bg-slate-400 dark:bg-slate-500"}`} style={{ width: `${max ? (value / max) * 100 : 0}%` }} />
+      <div className="h-2 rounded-full bg-surface-sunken" aria-hidden>
+        <div className={`h-full rounded-full ${highlight ? "bg-brand-500" : "bg-control"}`} style={{ width: `${max ? (value / max) * 100 : 0}%` }} />
       </div>
-      {extra && <p className="text-xs text-slate-500 dark:text-slate-400">{extra}</p>}
+      {extra && <p className="text-xs text-text-tertiary">{extra}</p>}
     </div>
   );
 }
@@ -55,12 +55,12 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
       <section className={card} aria-labelledby="status-title">
         <div className="flex items-baseline justify-between gap-2">
           <h2 id="status-title" className={h2}>응답 현황</h2>
-          <span className="text-lg font-bold text-sky-700 dark:text-sky-300">
+          <span className="text-lg font-bold text-brand-text">
             {c.responseCount} / {c.memberCount}명
           </span>
         </div>
-        <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800" aria-hidden>
-          <div className="h-full rounded-full bg-sky-600" style={{ width: `${c.memberCount ? (c.responseCount / c.memberCount) * 100 : 0}%` }} />
+        <div className="h-2 rounded-full bg-surface-sunken" aria-hidden>
+          <div className="h-full rounded-full bg-brand-500" style={{ width: `${c.memberCount ? (c.responseCount / c.memberCount) * 100 : 0}%` }} />
         </div>
         {waiting.length > 0 && <p className={muted}>아직 응답 안 한 사람: {waiting.map((m) => m.display_name).join(", ")}</p>}
         <p className={muted}>응답 마감 {formatKDate(trip.response_deadline)}{trip.status === "closed" ? " · 방장이 마감했어요" : deadlinePassed ? " · 마감일이 지났어요" : ""}</p>
@@ -70,7 +70,7 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
             <button
               type="button"
               onClick={onConfirm}
-              className={`${primaryButton} ${!open ? "ring-4 ring-sky-200 dark:ring-sky-900" : ""}`}
+              className={`${primaryButton} ${!open ? "ring-4 ring-brand-500/25" : ""}`}
             >
               {open ? "지금 확정하기" : "확정하기"}
             </button>
@@ -130,14 +130,14 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
             <h2 id="budget-title" className={h2}>1인 예산</h2>
             <dl className="grid grid-cols-3 gap-2 text-center">
               {[["최소", c.budget.min], ["중간값", c.budget.median], ["최대", c.budget.max]].map(([label, value]) => (
-                <div key={label as string} className="rounded-xl bg-slate-100 px-2 py-2.5 dark:bg-slate-800">
-                  <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
+                <div key={label as string} className="rounded-lg bg-surface-sunken px-2 py-2.5">
+                  <dt className="text-xs text-text-tertiary">{label}</dt>
                   <dd className="text-sm font-semibold">{won(value as number)}</dd>
                 </div>
               ))}
             </dl>
             <p className="text-base">
-              추천 1인 예산 <strong className="text-sky-700 dark:text-sky-300">{won(c.budget.recommended)}</strong>
+              추천 1인 예산 <strong className="text-brand-text">{won(c.budget.recommended)}</strong>
               <span className={`block ${muted}`}>중간값을 1만 원 단위로 내리고, 최소값보다 낮아지지 않게 정했어요.</span>
             </p>
             <div className="space-y-2">
@@ -160,7 +160,7 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
             <h3 className={h3}>선호 출발 시간대</h3>
             <ul className="flex flex-wrap gap-2 text-sm">
               {c.departCounts.map((d) => (
-                <li key={d.slot} className="rounded-full bg-slate-100 px-3 py-1 dark:bg-slate-800">
+                <li key={d.slot} className="rounded-full bg-surface-sunken px-3 py-1">
                   {DEPART_LABEL[d.slot]} <strong>{d.count}</strong>
                 </li>
               ))}
@@ -198,13 +198,13 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
                 {recs.map(({ destination: d, estimate, reasons }) => {
                   const listed = data.options.some((o) => o.name === d.name);
                   return (
-                    <li key={d.name} className="flex items-start gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+                    <li key={d.name} className="flex items-start gap-3 rounded-lg border border-line p-3">
                       <div className="min-w-0 flex-1 space-y-0.5">
                         <p className="font-semibold">
-                          {d.name} <span className="text-sm font-normal text-slate-500">{formatEstimate(estimate)}</span>
+                          {d.name} <span className="text-sm font-normal text-text-tertiary">{formatEstimate(estimate)}</span>
                         </p>
                         <p className="text-sm">{d.summary}</p>
-                        {reasons.length > 0 && <p className="text-xs text-sky-700 dark:text-sky-300">{reasons.join(" · ")}</p>}
+                        {reasons.length > 0 && <p className="text-xs text-brand-text">{reasons.join(" · ")}</p>}
                       </div>
                       {open && (
                         <button type="button" disabled={listed} className={secondaryButton} onClick={() => run(() => addOption(supabase, trip.id, d.name))}>

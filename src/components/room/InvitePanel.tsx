@@ -72,7 +72,7 @@ export default function InvitePanel({ trip, onClose }: { trip: TripRow; onClose?
           <p className={muted}>링크를 받은 사람은 로그인 후 바로 참여할 수 있어요.</p>
         </div>
         {onClose && (
-          <button type="button" onClick={onClose} className="rounded-lg px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button type="button" onClick={onClose} className="rounded-md px-2 py-1 text-sm text-text-tertiary hover:bg-surface-sunken">
             닫기
           </button>
         )}
@@ -93,7 +93,7 @@ export default function InvitePanel({ trip, onClose }: { trip: TripRow; onClose?
           </button>
         ))}
       </div>
-      <p role="status" className={notice ? "text-sm text-sky-700 dark:text-sky-300" : "sr-only"}>
+      <p role="status" className={notice ? "text-sm text-brand-text" : "sr-only"}>
         {notice}
       </p>
       <p className={muted}>링크를 아는 사람은 누구나 참여할 수 있어요. 연락처·계좌번호는 적지 마세요.</p>

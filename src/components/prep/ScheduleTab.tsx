@@ -80,7 +80,7 @@ export default function ScheduleTab() {
       <BookingLinks />
       {totalCost > 0 && <p className={muted}>예상 비용 합계 {won(totalCost)}</p>}
       {notice && (
-        <p role="status" className="rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-800 dark:bg-sky-950 dark:text-sky-200">
+        <p role="status" className="rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-text">
           {notice}
         </p>
       )}
@@ -90,7 +90,7 @@ export default function ScheduleTab() {
         return (
           <div key={date} className="space-y-2">
             <h3 className="font-semibold">
-              {i + 1}일차 <span className="text-sm font-normal text-slate-500 dark:text-slate-400">{formatKDate(date)}</span>
+              {i + 1}일차 <span className="text-sm font-normal text-text-tertiary">{formatKDate(date)}</span>
             </h3>
 
             <ul className="space-y-1">
@@ -100,15 +100,15 @@ export default function ScheduleTab() {
                 const liked = slotLikes.some((l) => l.user_id === me);
                 const slotComments = comments.filter((c) => c.slot_id === s.id);
                 return (
-                  <li key={s.id} className="rounded-xl ring-slate-200 has-[form]:ring-1 dark:ring-slate-800">
+                  <li key={s.id} className="rounded-lg ring-line has-[form]:ring-1">
                     <div className="flex items-start gap-1">
                       <button
                         type="button"
                         onClick={() => setEditing(open ? null : { kind: "edit", id: s.id })}
                         aria-expanded={open}
-                        className="flex min-w-0 flex-1 items-start gap-3 rounded-xl px-2 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-800"
+                        className="flex min-w-0 flex-1 items-start gap-3 rounded-lg px-2 py-2 text-left text-sm hover:bg-surface-sunken"
                       >
-                        <span className="w-11 shrink-0 text-slate-500 dark:text-slate-400">{s.time || LABELS.slot[s.slot]}</span>
+                        <span className="w-11 shrink-0 text-text-tertiary">{s.time || LABELS.slot[s.slot]}</span>
                         <span className="min-w-0 flex-1">
                           {s.place || s.activity ? (
                             <>
@@ -117,9 +117,9 @@ export default function ScheduleTab() {
                               {s.activity}
                             </>
                           ) : (
-                            <span className="text-slate-400">비어 있음 (눌러서 채우기)</span>
+                            <span className="text-text-tertiary">비어 있음 (눌러서 채우기)</span>
                           )}
-                          {s.memo && <span className="block text-xs text-slate-500 dark:text-slate-400">{s.memo}</span>}
+                          {s.memo && <span className="block text-xs text-text-tertiary">{s.memo}</span>}
                           <span className="mt-0.5 flex flex-wrap gap-1.5">
                             {s.needs_booking && <span className={`${badge} ${badgeTone.amber}`}>예약</span>}
                             {s.cost > 0 && <span className={`${badge} ${badgeTone.gray}`}>{won(s.cost)}</span>}
@@ -132,7 +132,7 @@ export default function ScheduleTab() {
                         onClick={() => toggleLike(s, liked)}
                         aria-pressed={liked}
                         aria-label={`좋아요 ${slotLikes.length}개${liked ? ", 내가 누름" : ""}`}
-                        className={`shrink-0 rounded-lg px-2 py-2 text-sm ${liked ? "text-rose-600" : "text-slate-400"} hover:bg-slate-100 dark:hover:bg-slate-800`}
+                        className={`shrink-0 rounded-md px-2 py-2 text-sm ${liked ? "text-rose-600" : "text-text-tertiary"} hover:bg-surface-sunken`}
                       >
                         {liked ? "♥" : "♡"} {slotLikes.length}
                       </button>
@@ -151,7 +151,7 @@ export default function ScheduleTab() {
             {editing?.kind === "new" && editing.date === date ? (
               <SlotForm key={`new-${date}`} trip={trip} initial={null} date={date} onSave={(v) => save(v, null)} onCancel={() => setEditing(null)} />
             ) : (
-              <button type="button" onClick={() => setEditing({ kind: "new", date })} className="px-2 text-sm font-medium text-sky-700 hover:underline dark:text-sky-300">
+              <button type="button" onClick={() => setEditing({ kind: "new", date })} className="px-2 text-sm font-medium text-brand-text hover:underline">
                 + 일정 추가
               </button>
             )}
@@ -243,7 +243,7 @@ function SlotForm({
       </div>
       <label className="flex items-center gap-2">
         <input type="checkbox" name="needsBooking" checked={form.needsBooking} onChange={(e) => set("needsBooking", e.target.checked)} />
-        예약 필요 <span className="text-xs text-slate-500">(할 일에 &quot;예약하기&quot; 자동 추가)</span>
+        예약 필요 <span className="text-xs text-text-tertiary">(할 일에 &quot;예약하기&quot; 자동 추가)</span>
       </label>
       <label className="block space-y-1">
         <span className={fieldLabel}>메모 (선택)</span>

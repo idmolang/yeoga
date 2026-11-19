@@ -74,7 +74,7 @@ export default function TripRoom({ tripId, me, created }: { tripId: string; me: 
     <RoomContext.Provider value={room}>
       <div className="space-y-6">
         {(actionError || error) && (
-          <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
             {actionError || error}
           </p>
         )}

@@ -76,7 +76,7 @@ export default function WithdrawSection({ hosted }: { hosted: HostedTrip[] }) {
             <div key={t.id} className="space-y-1">
               <label className="block space-y-1">
                 <span className={fieldLabel}>
-                  &quot;{t.name}&quot; 방 <span className="font-normal text-slate-500">(내가 방장)</span>
+                  &quot;{t.name}&quot; 방 <span className="font-normal text-text-tertiary">(내가 방장)</span>
                 </span>
                 <select
                   {...v.field(`trip-${t.id}`)}

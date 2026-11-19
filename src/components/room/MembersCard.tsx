@@ -41,11 +41,11 @@ export default function MembersCard() {
   return (
     <section className={card} aria-labelledby="members-title">
       <h2 id="members-title" className={h2}>
-        참여자 <span className="text-base font-normal text-slate-500">{data.members.length}명</span>
+        참여자 <span className="text-base font-normal text-text-tertiary">{data.members.length}명</span>
       </h2>
       <ul className="flex flex-wrap gap-2">
         {data.members.map((m) => (
-          <li key={m.user_id} className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-sm dark:bg-slate-800">
+          <li key={m.user_id} className="flex items-center gap-1.5 rounded-full bg-surface-sunken px-3 py-1.5 text-sm">
             <span className="font-medium">{m.display_name}</span>
             {m.user_id === data.trip.host_id && <span className={`${badge} ${badgeTone.sky}`}>방장</span>}
             {m.user_id === me && <span className={`${badge} ${badgeTone.gray}`}>나</span>}
