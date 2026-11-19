@@ -1,7 +1,7 @@
 // 여행 화면 상단: 이름, 단계(모으기 → 조율 → 준비), D-day·인원·예산 요약
 
 import StageStepper from "@/components/room/StageStepper";
-import { h1, muted } from "@/components/styles";
+import { muted, pageTitle } from "@/components/styles";
 import { formatRange } from "@/lib/date";
 import { ddayText, type Stage } from "@/lib/stage";
 import { LABELS } from "@/types/trip";
@@ -25,23 +25,23 @@ export default function TripHeader({
   const where = trip.destination ?? "여행지 미정";
 
   return (
-    <header className="space-y-4">
+    <header className="intro space-y-4">
       <div className="space-y-1">
-        <h1 className={h1}>{trip.name}</h1>
+        <h1 className={pageTitle}>{trip.name}</h1>
         <p className={muted}>
           {LABELS.region[trip.region]} · {where} · {when}
         </p>
       </div>
       <StageStepper stage={stage} />
-      <dl className="grid grid-cols-3 gap-2 text-center">
+      <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
         {[
           ["일정", ddayText(trip)],
           ["인원", people],
           ["1인 예산", budget],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-lg bg-surface px-2 py-2.5 ring-1 ring-line">
-            <dt className="text-xs text-text-tertiary">{label}</dt>
-            <dd className="text-sm font-semibold">{value}</dd>
+          <div key={label} className="flex gap-2">
+            <dt className="text-text-tertiary">{label}</dt>
+            <dd className="font-semibold">{value}</dd>
           </div>
         ))}
       </dl>

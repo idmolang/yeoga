@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  viewportFit: "cover", // 하단 고정 버튼이 safe area 를 반영하도록
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f9fafb" },
     { media: "(prefers-color-scheme: dark)", color: "#17171c" },
@@ -30,7 +31,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col">
         <header className="border-b border-line bg-surface/80 backdrop-blur">
-          <div className="mx-auto flex h-14 w-full max-w-2xl items-center justify-between px-4">
+          <div className="mx-auto flex h-14 w-full max-w-2xl items-center justify-between px-6">
             <Link href="/" className="text-xl font-extrabold tracking-[-0.02em] text-brand-text">
               여가
             </Link>
@@ -48,7 +49,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             )}
           </div>
         </header>
-        <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:py-8">{children}</main>
+        <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-6 sm:py-8">{children}</main>
       </body>
     </html>
   );

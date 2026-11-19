@@ -10,14 +10,16 @@ import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
 type Props = {
   as?: "div" | "section" | "li" | "ul" | "ol" | "header";
-  /** 목록에서의 순서. 순서 × 40ms 지연 (최대 5번째, 200ms) */
+  /** 목록에서의 순서. 순서 × 40ms 지연 (최대 5번째, 200ms). lg 는 × 80ms */
   index?: number;
+  /** md: 앱 안쪽 화면(280ms, 10px). lg: 첫 화면 큰 섹션(600ms, 28px) */
+  size?: "md" | "lg";
   className?: string;
   children?: ReactNode;
   "aria-labelledby"?: string;
 };
 
-export default function Reveal({ as = "div", index = 0, children, ...rest }: Props) {
+export default function Reveal({ as = "div", index = 0, size = "md", children, ...rest }: Props) {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -62,9 +64,9 @@ export default function Reveal({ as = "div", index = 0, children, ...rest }: Pro
 
   // 모든 태그가 HTMLElement 이므로 div 로 간주해 ref 타입을 맞춘다
   const Tag = as as "div";
-  const style = { "--reveal-delay": `${Math.min(index, 5) * 40}ms` } as CSSProperties;
+  const style = { "--reveal-delay": `${Math.min(index, 5) * (size === "lg" ? 80 : 40)}ms` } as CSSProperties;
   return (
-    <Tag ref={ref as React.RefObject<HTMLDivElement>} style={style} {...rest}>
+    <Tag ref={ref as React.RefObject<HTMLDivElement>} style={style} data-reveal-size={size} {...rest}>
       {children}
     </Tag>
   );

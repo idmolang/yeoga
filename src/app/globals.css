@@ -205,3 +205,69 @@ select {
     transition: none !important;
   }
 }
+
+/* 첫 화면 큰 섹션 등장(lg): 600ms, 28px. 앱 안쪽 화면은 위의 md(280ms) 그대로 */
+[data-reveal-size="lg"][data-reveal="hidden"] {
+  transform: translateY(28px);
+}
+[data-reveal-size="lg"][data-reveal="shown"] {
+  transition-duration: 600ms, 600ms;
+}
+
+/*
+ * 화면이 열릴 때 보이는 요소의 순서 등장 (Intro 컴포넌트). CSS 애니메이션만 쓴다.
+ * JS 없이도 동작하고, 끝나면 원래 상태(보임)로 남는다. 모션 줄이기에서는 애니메이션 자체가 없다.
+ */
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--intro-dist, 10px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.intro {
+  animation: intro-rise var(--intro-dur, 280ms) var(--ease-out) both;
+  animation-delay: var(--intro-delay, 0ms);
+}
+.intro-lg {
+  --intro-dur: 600ms;
+  --intro-dist: 28px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    animation: none;
+  }
+}
+
+/* 아래에서 올라오는 시트 (BottomSheet, <dialog>) */
+dialog.sheet {
+  margin: auto auto 0;
+  width: 100%;
+  max-width: 42rem;
+  max-height: 90svh;
+  padding: 0;
+  border: 0;
+  border-radius: 24px 24px 0 0;
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: 0 -2px 12px rgb(0 0 0 / 0.06);
+}
+dialog.sheet[open] {
+  animation: sheet-up var(--dur-slow) var(--ease-out);
+}
+dialog.sheet::backdrop {
+  background: rgb(0 0 0 / 0.56);
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  dialog.sheet[open] {
+    animation: none;
+  }
+}

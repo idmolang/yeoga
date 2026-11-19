@@ -3,12 +3,15 @@
 // F-05 조율 응답 (단계형): 가능한 날짜 → 1인 예산 → 스타일 → 여행지 투표·제안(미정일 때) → 출발 시간대
 // 이름은 참여할 때 이미 받았으므로 FRD 7장의 1단계(이름)는 건너뛴다. 마감 전까지 다시 열어 고칠 수 있다.
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import BottomCTA from "@/components/BottomCTA";
+import EmptyState from "@/components/EmptyState";
 import FieldError from "@/components/FieldError";
+import Intro from "@/components/Intro";
 import DateCalendar from "@/components/room/DateCalendar";
 import { useRoomContext } from "@/components/room/RoomContext";
 import StepProgress from "@/components/StepProgress";
-import { card, choice, fieldLabel, ghostButton, h2, input, muted, primaryButtonL, secondaryButton, subtleBox } from "@/components/styles";
+import { choice, fieldLabel, ghostButton, input, muted, pageDesc, pageTitle, primaryButtonXl, row, rowGroup, secondaryButton, subtleBox } from "@/components/styles";
 import { dateRange, formatKDate, weekday } from "@/lib/date";
 import { saveResponse } from "@/lib/db";
 import { responsesOpen } from "@/lib/stage";
@@ -24,6 +27,11 @@ export const DEPART_LABEL: Record<DepartSlot, string> = {
 };
 
 type StepId = "dates" | "budget" | "styles" | "places" | "depart";
+// 단계마다 한 줄 설명 (dates·places 는 화면 안의 기존 안내 문구를 그대로 쓴다)
+const STEP_DESC: Partial<Record<StepId, string>> = {
+  styles: "여러 개 골라도 돼요.",
+  depart: "가장 편한 시간대를 하나 골라 주세요.",
+};
 const STEP_TITLE: Record<StepId, string> = {
   dates: "언제 갈 수 있어요?",
   budget: "1인 예산은 얼마까지 괜찮아요?",
@@ -159,14 +167,35 @@ function ResponseSteps({
   const weekends = windowDates.filter((d) => [0, 5, 6].includes(weekday(d)));
 
   return (
-    <form noValidate onSubmit={handleSubmit} onChangeCapture={v.clearOnChange} className={`${card} space-y-6`}>
-      <StepProgress step={step} total={steps.length} />
-      <fieldset key={current} ref={fieldsetRef} className="space-y-4">
-        <legend className="mb-4 text-xl font-bold">{STEP_TITLE[current]}</legend>
+    <form noValidate onSubmit={handleSubmit} onChangeCapture={v.clearOnChange} className="space-y-8">
+      <div className="space-y-2">
+        <div className="flex h-10 items-center">
+          {step > 0 && (
+            <button type="button" onClick={() => setStep(step - 1)} className={`${ghostButton} -ml-3 gap-1 pl-2`}>
+              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="m15 5-7 7 7 7" />
+              </svg>
+              이전
+            </button>
+          )}
+        </div>
+        <StepProgress step={step} total={steps.length} />
+      </div>
+
+      <fieldset key={current} ref={fieldsetRef} className="intro min-w-0 space-y-6" style={{ "--intro-dur": "240ms", "--intro-dist": "8px" } as CSSProperties}>
+        <legend className={`${pageTitle} mb-2 p-0`}>{STEP_TITLE[current]}</legend>
+        <p className={`${pageDesc} -mt-4`}>
+          {current === "dates"
+            ? `가능한 날짜를 모두 눌러 주세요. ${values.dates.size}일 선택됨`
+            : current === "places"
+              ? "가고 싶은 곳에 모두 투표하세요 (선택). 없으면 직접 제안할 수 있어요."
+              : current === "budget"
+                ? "교통·숙소·식비를 포함한 희망 금액이에요."
+                : STEP_DESC[current]}
+        </p>
 
         {current === "dates" && (
           <>
-            <p className={muted}>가능한 날짜를 모두 눌러 주세요. {values.dates.size}일 선택됨</p>
             <div className="flex flex-wrap gap-2">
               <button type="button" className={secondaryButton} onClick={() => set("dates", new Set(windowDates))}>전체 선택</button>
               <button type="button" className={secondaryButton} onClick={() => set("dates", new Set([...values.dates, ...weekends]))}>금·토·일 추가</button>
@@ -178,7 +207,10 @@ function ResponseSteps({
         )}
 
         {current === "budget" && (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <p className="text-[40px] font-bold tabular-nums leading-none tracking-[-0.02em]">
+              {Math.round(values.budget / 10000).toLocaleString("ko-KR")}만 원
+            </p>
             <input
               type="range"
               className="w-full accent-brand-600"
@@ -189,8 +221,8 @@ function ResponseSteps({
               onChange={(e) => set("budget", Number(e.target.value))}
               aria-label="희망 1인 예산 슬라이더"
             />
-            <div className="space-y-1">
-              <label className="block space-y-1">
+            <div className="space-y-2">
+              <label className="block space-y-2">
                 <span className={fieldLabel}>희망 1인 예산 (원, 교통·숙소·식비 포함)</span>
                 <input
                   {...v.field("budget")}
@@ -207,15 +239,15 @@ function ResponseSteps({
               </label>
               <FieldError id={v.errorId("budget")} message={v.errors.budget} />
             </div>
-            <p className={muted}>약 {Math.round(values.budget / 10000).toLocaleString("ko-KR")}만 원. 다른 사람에게는 최소·최대·중간값으로만 모아서 보여줘요.</p>
+            <p className={muted}>다른 사람에게는 최소·최대·중간값으로만 모아서 보여줘요.</p>
           </div>
         )}
 
         {current === "styles" && (
           <>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-3">
               {(Object.keys(LABELS.style) as Style[]).map((s) => (
-                <label key={s} className={choice}>
+                <label key={s} className={`${choice} min-h-14`}>
                   <input type="checkbox" name="styles" checked={values.styles.includes(s)} onChange={() => toggleStyle(s)} aria-describedby={v.errorId("styles")} />
                   {LABELS.style[s]}
                 </label>
@@ -227,25 +259,24 @@ function ResponseSteps({
 
         {current === "places" && (
           <>
-            <p className={muted}>가고 싶은 곳에 모두 투표하세요 (선택). 없으면 직접 제안할 수 있어요.</p>
             {options.length + proposals.length === 0 && <p className={subtleBox}>아직 후보가 없어요. 첫 후보를 제안해 주세요!</p>}
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="space-y-3">
               {options.map((o) => (
-                <label key={o.id} className={choice}>
+                <label key={o.id} className={`${choice} min-h-14`}>
                   <input type="checkbox" name="votes" checked={values.voteIds.includes(o.id)} onChange={() => toggleVote(o.id)} />
                   {o.name}
                 </label>
               ))}
               {proposals.map((name) => (
-                <label key={name} className={choice}>
+                <label key={name} className={`${choice} min-h-14`}>
                   <input type="checkbox" name="proposals" checked onChange={() => setProposals(proposals.filter((p) => p !== name))} />
                   {name} <span className="text-xs text-brand-text">내 제안</span>
                 </label>
               ))}
             </div>
-            <div className="space-y-1">
+            <div className="space-y-2">
               <div className="flex items-end gap-2">
-                <label className="block min-w-0 flex-1 space-y-1">
+                <label className="block min-w-0 flex-1 space-y-2">
                   <span className={fieldLabel}>여행지 제안</span>
                   <input
                     {...v.field("proposal")}
@@ -262,7 +293,7 @@ function ResponseSteps({
                     }}
                   />
                 </label>
-                <button type="button" className={secondaryButton} onClick={addProposal}>추가</button>
+                <button type="button" className={`${secondaryButton} min-h-12`} onClick={addProposal}>추가</button>
               </div>
               <FieldError id={v.errorId("proposal")} message={v.errors.proposal} />
             </div>
@@ -270,9 +301,9 @@ function ResponseSteps({
         )}
 
         {current === "depart" && (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-3">
             {(Object.keys(DEPART_LABEL) as DepartSlot[]).map((s) => (
-              <label key={s} className={choice}>
+              <label key={s} className={`${choice} min-h-14`}>
                 <input type="radio" name="depart" required checked={values.depart === s} onChange={() => set("depart", s)} />
                 {DEPART_LABEL[s]}
               </label>
@@ -281,12 +312,11 @@ function ResponseSteps({
         )}
       </fieldset>
 
-      <div className="flex gap-3">
-        <button type="button" onClick={() => setStep(step - 1)} disabled={step === 0} className={secondaryButton}>이전</button>
-        <button type="submit" disabled={pending} className={`flex-1 ${primaryButtonL}`}>
+      <BottomCTA>
+        <button type="submit" disabled={pending} className={`${primaryButtonXl} w-full`}>
           {isLast ? (pending ? "저장하는 중…" : "응답 저장") : "다음"}
         </button>
-      </div>
+      </BottomCTA>
     </form>
   );
 }
@@ -298,24 +328,28 @@ function ResponseSummary({ open, onEdit }: { open: boolean; onEdit: () => void }
   const myVotes = data.votes.filter((v) => v.user_id === me).map((v) => data.options.find((o) => o.id === v.option_id)?.name).filter(Boolean);
 
   return (
-    <section className={card} aria-labelledby="my-response">
-      <h2 id="my-response" className={h2}>내 응답</h2>
-      {!open && <p className={subtleBox}>{data.trip.status === "collecting" ? "응답 마감일이 지나서" : "방장이 응답을 마감해서"} 더 이상 고칠 수 없어요.</p>}
+    <section aria-labelledby="my-response" className="space-y-6">
+      <Intro as="header" size="md" className="space-y-2">
+        <h2 id="my-response" className={pageTitle}>내 응답</h2>
+        {!open && <p className={pageDesc}>{data.trip.status === "collecting" ? "응답 마감일이 지나서" : "방장이 응답을 마감해서"} 더 이상 고칠 수 없어요.</p>}
+      </Intro>
       {mine ? (
-        <dl className="grid gap-3 text-sm sm:grid-cols-2">
-          <div><dt className={muted}>가능한 날짜</dt><dd>{mine.available_dates.length}일 · {mine.available_dates.slice(0, 3).map(formatKDate).join(", ")}{mine.available_dates.length > 3 ? " …" : ""}</dd></div>
-          <div><dt className={muted}>희망 1인 예산</dt><dd>{mine.budget.toLocaleString("ko-KR")}원</dd></div>
-          <div><dt className={muted}>스타일</dt><dd>{mine.styles.map((s) => LABELS.style[s]).join(", ")}</dd></div>
-          <div><dt className={muted}>출발 시간대</dt><dd>{DEPART_LABEL[mine.depart_slot]}</dd></div>
-          {!data.trip.destination_fixed && <div><dt className={muted}>투표한 여행지</dt><dd>{myVotes.join(", ") || "없음"}</dd></div>}
+        <dl className={rowGroup}>
+          <div className={row}><dt className={muted}>가능한 날짜</dt><dd className="text-right">{mine.available_dates.length}일 · {mine.available_dates.slice(0, 3).map(formatKDate).join(", ")}{mine.available_dates.length > 3 ? " …" : ""}</dd></div>
+          <div className={row}><dt className={muted}>희망 1인 예산</dt><dd className="text-right">{mine.budget.toLocaleString("ko-KR")}원</dd></div>
+          <div className={row}><dt className={muted}>스타일</dt><dd className="text-right">{mine.styles.map((s) => LABELS.style[s]).join(", ")}</dd></div>
+          <div className={row}><dt className={muted}>출발 시간대</dt><dd className="text-right">{DEPART_LABEL[mine.depart_slot]}</dd></div>
+          {!data.trip.destination_fixed && <div className={row}><dt className={muted}>투표한 여행지</dt><dd className="text-right">{myVotes.join(", ") || "없음"}</dd></div>}
         </dl>
       ) : (
-        <p className={muted}>응답하지 않았어요.</p>
+        <EmptyState title="응답하지 않았어요" />
       )}
       {open && (
-        <button type="button" className={secondaryButton} onClick={onEdit}>
-          {mine ? "응답 고치기" : "응답하기"}
-        </button>
+        <BottomCTA>
+          <button type="button" className={`${primaryButtonXl} w-full`} onClick={onEdit}>
+            {mine ? "응답 고치기" : "응답하기"}
+          </button>
+        </BottomCTA>
       )}
     </section>
   );

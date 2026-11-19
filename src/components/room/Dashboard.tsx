@@ -2,11 +2,16 @@
 
 // F-06 조율 대시보드 (+ F-07 여행지 후보 추천)
 
+import { useState } from "react";
+import BottomCTA from "@/components/BottomCTA";
+import BottomSheet from "@/components/BottomSheet";
+import EmptyState from "@/components/EmptyState";
+import Intro from "@/components/Intro";
 import Reveal from "@/components/Reveal";
 import DateCalendar from "@/components/room/DateCalendar";
 import { DEPART_LABEL } from "@/components/room/ResponseForm";
 import { useRoomContext } from "@/components/room/RoomContext";
-import { badge, badgeTone, card, h2, h3, muted, primaryButton, secondaryButton, subtleBox } from "@/components/styles";
+import { badge, badgeTone, card, h2, h3, muted, pageDesc, pageTitle, primaryButtonXl, row, secondaryButton, subtleBox } from "@/components/styles";
 import type { Coordination, Period } from "@/lib/coordinate";
 import { formatKDate } from "@/lib/date";
 import { addOption, updateTrip } from "@/lib/db";
@@ -36,6 +41,7 @@ function Bar({ label, value, max, highlight, extra }: { label: string; value: nu
 
 export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm: () => void }) {
   const { data, isHost, supabase, run, nameOf } = useRoomContext();
+  const [closeOpen, setCloseOpen] = useState(false);
   const { trip } = data;
   const open = responsesOpen(trip);
   const waiting = data.members.filter((m) => !c.responders.includes(m.user_id));
@@ -51,12 +57,19 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
       : [];
 
   return (
-    <div className="space-y-6">
-      {/* 응답 현황 + 방장 버튼 */}
+    <div className="space-y-8">
+      <Intro as="header" className="space-y-2">
+        <h2 className={pageTitle}>조율 현황</h2>
+        <p className={pageDesc}>
+          전체 {c.memberCount}명 중 {c.responseCount}명이 응답했어요.
+        </p>
+      </Intro>
+
+      {/* 응답 현황 */}
       <Reveal as="section" className={card} aria-labelledby="status-title">
         <div className="flex items-baseline justify-between gap-2">
           <h2 id="status-title" className={h2}>응답 현황</h2>
-          <span className="text-lg font-bold text-brand-text">
+          <span className="text-[28px] font-bold leading-none tabular-nums tracking-[-0.02em] text-brand-text">
             {c.responseCount} / {c.memberCount}명
           </span>
         </div>
@@ -66,30 +79,39 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
         {waiting.length > 0 && <p className={muted}>아직 응답 안 한 사람: {waiting.map((m) => m.display_name).join(", ")}</p>}
         <p className={muted}>응답 마감 {formatKDate(trip.response_deadline)}{trip.status === "closed" ? " · 방장이 마감했어요" : deadlinePassed ? " · 마감일이 지났어요" : ""}</p>
 
-        {isHost && (
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={onConfirm}
-              className={`${primaryButton} ${!open ? "ring-4 ring-brand-500/25" : ""}`}
-            >
-              {open ? "지금 확정하기" : "확정하기"}
+        {isHost &&
+          (trip.status === "collecting" ? (
+            <button type="button" className={`${secondaryButton} w-full`} onClick={() => setCloseOpen(true)}>
+              응답 마감하기
             </button>
-            {trip.status === "collecting" ? (
-              <button type="button" className={secondaryButton} onClick={() => confirm("응답을 마감할까요? 참여자가 더 이상 응답을 고칠 수 없어요.") && run(() => updateTrip(supabase, trip.id, { status: "closed" }))}>
-                응답 마감하기
-              </button>
-            ) : (
-              <button type="button" className={secondaryButton} onClick={() => run(() => updateTrip(supabase, trip.id, { status: "collecting" }))}>
-                응답 다시 받기
-              </button>
-            )}
-          </div>
-        )}
+          ) : (
+            <button type="button" className={`${secondaryButton} w-full`} onClick={() => run(() => updateTrip(supabase, trip.id, { status: "collecting" }))}>
+              응답 다시 받기
+            </button>
+          ))}
       </Reveal>
 
+      <BottomSheet open={closeOpen} onClose={() => setCloseOpen(false)} title="응답을 마감할까요?">
+        <p className={pageDesc}>참여자가 더 이상 응답을 고칠 수 없어요.</p>
+        <div className="space-y-3">
+          <button
+            type="button"
+            className={`${primaryButtonXl} w-full`}
+            onClick={() => {
+              setCloseOpen(false);
+              run(() => updateTrip(supabase, trip.id, { status: "closed" }));
+            }}
+          >
+            응답 마감하기
+          </button>
+          <button type="button" className={`${secondaryButton} min-h-12 w-full`} onClick={() => setCloseOpen(false)}>
+            취소
+          </button>
+        </div>
+      </BottomSheet>
+
       {c.responseCount === 0 ? (
-        <p className={subtleBox}>아직 응답이 없어요. 친구를 초대하고 응답을 기다려 주세요.</p>
+        <EmptyState title="아직 응답이 없어요">친구를 초대하고 응답을 기다려 주세요.</EmptyState>
       ) : (
         <>
           {/* 날짜 */}
@@ -98,9 +120,9 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
             {c.periods.length > 0 ? (
               <div className="space-y-2">
                 <h3 className={h3}>전원 가능한 기간</h3>
-                <ol className="space-y-1.5">
+                <ol className="divide-y divide-line">
                   {c.periods.map((p, i) => (
-                    <li key={p.start} className="flex items-center gap-2 text-sm">
+                    <li key={p.start} className="flex items-center gap-3 py-3 text-sm">
                       <span className={`${badge} ${i === 0 ? badgeTone.sky : badgeTone.gray}`}>{i === 0 ? "추천" : `${i + 1}순위`}</span>
                       {periodText(p)}
                     </li>
@@ -129,18 +151,19 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
           {/* 예산 */}
           <Reveal as="section" className={card} aria-labelledby="budget-title">
             <h2 id="budget-title" className={h2}>1인 예산</h2>
-            <dl className="grid grid-cols-3 gap-2 text-center">
+            <div className="space-y-1 rounded-lg bg-brand-50 px-4 py-4">
+              <p className="text-sm text-brand-text">추천 1인 예산</p>
+              <p className="text-[28px] font-bold leading-tight tabular-nums tracking-[-0.02em] text-brand-text">{won(c.budget.recommended)}</p>
+              <p className={muted}>중간값을 1만 원 단위로 내리고, 최소값보다 낮아지지 않게 정했어요.</p>
+            </div>
+            <dl className="divide-y divide-line">
               {[["최소", c.budget.min], ["중간값", c.budget.median], ["최대", c.budget.max]].map(([label, value]) => (
-                <div key={label as string} className="rounded-lg bg-surface-sunken px-2 py-2.5">
-                  <dt className="text-xs text-text-tertiary">{label}</dt>
-                  <dd className="text-sm font-semibold">{won(value as number)}</dd>
+                <div key={label as string} className={row}>
+                  <dt className={muted}>{label}</dt>
+                  <dd className="font-semibold tabular-nums">{won(value as number)}</dd>
                 </div>
               ))}
             </dl>
-            <p className="text-base">
-              추천 1인 예산 <strong className="text-brand-text">{won(c.budget.recommended)}</strong>
-              <span className={`block ${muted}`}>중간값을 1만 원 단위로 내리고, 최소값보다 낮아지지 않게 정했어요.</span>
-            </p>
             <div className="space-y-2">
               <h3 className={h3}>응답 분포</h3>
               {c.budget.buckets.map(([from, count]) => (
@@ -219,6 +242,14 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
             </div>
           )}
         </Reveal>
+      )}
+
+      {isHost && (
+        <BottomCTA>
+          <button type="button" onClick={onConfirm} className={`${primaryButtonXl} w-full`}>
+            {open ? "지금 확정하기" : "확정하기"}
+          </button>
+        </BottomCTA>
       )}
     </div>
   );

@@ -11,6 +11,12 @@ export const h1 = "text-2xl font-bold tracking-[-0.02em]";
 export const h2 = "text-lg font-semibold tracking-[-0.01em]";
 export const h3 = "text-[17px] font-semibold tracking-[-0.01em]";
 export const muted = "text-sm text-text-tertiary";
+/** 화면 위쪽의 큰 제목(28px Bold)과 한 줄 설명 */
+export const pageTitle = "text-[28px] font-bold leading-[1.3] tracking-[-0.02em]";
+export const pageDesc = "text-[15px] text-text-tertiary";
+/** 목록 행: 왼쪽 라벨 + 오른쪽 값. 부모에 divide-y divide-line */
+export const row = "flex items-center justify-between gap-4 py-3.5";
+export const rowGroup = "divide-y divide-line rounded-xl bg-surface px-4 ring-1 ring-line";
 
 // 상자
 export const card =
