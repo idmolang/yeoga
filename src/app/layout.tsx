@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f8fa" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d1318" },
+    { media: "(prefers-color-scheme: light)", color: "#f9fafb" },
+    { media: "(prefers-color-scheme: dark)", color: "#17171c" },
   ],
 };
 
@@ -20,6 +20,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 
   return (
     <html lang="ko" className="h-full antialiased">
+      <head>
+        {/* Pretendard 동적 서브셋(jsdelivr). display: swap이라 불러오기 전·실패 시 시스템 글꼴로 보인다 */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
       <body className="flex min-h-full flex-col">
         <header className="border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
           <div className="mx-auto flex h-14 w-full max-w-2xl items-center justify-between px-4">

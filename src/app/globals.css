@@ -1,9 +1,122 @@
 @import "tailwindcss";
 
+/*
+ * 디자인 토큰 (toss.md 시각 언어 + 푸른 하늘 강조색 세트 B)
+ * - 회색 단계, 강조색 1개, 4px 간격, 라운드 단계, 모션 토큰
+ * - 다크 모드 값은 아래 prefers-color-scheme 한 곳에서 전환한다
+ * - 강조색: 500은 아이콘·진행바·포커스링(3:1), 600은 버튼 채움·링크 글자(흰 글자 4.9:1)
+ */
+
 :root {
-  --background: #f6f8fa;
-  --foreground: #16202a;
   color-scheme: light;
+
+  /* 강조색 (푸른 하늘) */
+  --brand-50: #f0f7fb;
+  --brand-500: #3d92cc;
+  --brand-600: #1f76ae; /* 버튼 채움. 흰 글자 4.93:1 */
+  --brand-700: #175d8a;
+
+  /* 화면·글자 */
+  --background: #f9fafb;
+  --foreground: #191f28;
+  --surface: #ffffff; /* 카드·입력칸 */
+  --surface-sunken: #f2f4f6; /* 보조 표면 */
+  --line: #e5e8eb; /* 1px 헤어라인 */
+  --text-secondary: #4e5968;
+  --text-tertiary: #646f7d; /* 흐린 글자. 흰 바탕 5.1:1, 화면 바탕 4.9:1 */
+
+  /* 눌림·비활성·스크림 */
+  --press-overlay: rgb(0 0 0 / 0.26);
+  --disabled-opacity: 0.3;
+
+  /* 모션 */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --brand-50: #182b3a;
+    --brand-500: #62aee6;
+    --brand-600: #1f76ae; /* 다크에서도 버튼 채움은 같은 색 + 흰 글자 */
+    --brand-700: #175d8a;
+
+    --background: #17171c;
+    --foreground: #ffffff;
+    --surface: #202027;
+    --surface-sunken: #2c2c35;
+    --line: #3c3c47;
+    --text-secondary: #c3c3c6;
+    --text-tertiary: #9e9ea4;
+  }
+}
+
+@theme {
+  /* 글꼴: Pretendard(CDN)가 없으면 시스템 글꼴로 보인다 */
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo",
+    "Noto Sans KR", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* 라운드 단계 */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+
+  /* 글자 크기 단계 (2단계에서 공통 스타일에 적용) */
+  --text-caption: 12px;
+  --text-body-3: 13px;
+  --text-body-2: 15px;
+  --text-body-1: 17px;
+
+  /*
+   * 1단계 임시 연결: 기존 slate-/sky- 클래스가 새 색을 가리키게 한다.
+   * 클래스를 고치지 않아도 앱 전체의 색이 바뀐다. 3단계에서 의미 토큰으로 옮기며 걷어낸다.
+   * slate: 라이트는 토스 회색 단계, 다크(dark: 클래스)가 쓰는 700~950은 다크 회색 단계.
+   */
+  --color-slate-50: #f9fafb;
+  --color-slate-100: #f2f4f6;
+  --color-slate-200: #e5e8eb;
+  --color-slate-300: #d1d6db;
+  --color-slate-400: #9ea6b1;
+  --color-slate-500: #646f7d;
+  --color-slate-600: #4e5968;
+  --color-slate-700: #3c3c47;
+  --color-slate-800: #2c2c35;
+  --color-slate-900: #202027;
+  --color-slate-950: #17171c;
+
+  /* sky: 푸른 하늘(세트 B). 700=버튼 채움, 600=포커스·선택, 500/400=밝은 강조 */
+  --color-sky-50: #f0f7fb;
+  --color-sky-100: #dcebf6;
+  --color-sky-200: #bbd8ee;
+  --color-sky-300: #8cc4ee;
+  --color-sky-400: #62aee6;
+  --color-sky-500: #3d92cc;
+  --color-sky-600: #1f76ae;
+  --color-sky-700: #1f76ae;
+  --color-sky-800: #175d8a;
+  --color-sky-900: #134b6f;
+  --color-sky-950: #182b3a;
+
+  /* 새 의미 토큰: 다크 값은 위 :root 변수가 전환한다 */
+  --color-brand-50: var(--brand-50);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-line: var(--line);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
 }
 
 @theme inline {
@@ -11,17 +124,9 @@
   --color-foreground: var(--foreground);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0d1318;
-    --foreground: #e6edf3;
-    color-scheme: dark;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  font-family: var(--font-sans);
   overflow-wrap: anywhere;
 }
