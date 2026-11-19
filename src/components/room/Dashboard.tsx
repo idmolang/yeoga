@@ -2,6 +2,7 @@
 
 // F-06 조율 대시보드 (+ F-07 여행지 후보 추천)
 
+import Reveal from "@/components/Reveal";
 import DateCalendar from "@/components/room/DateCalendar";
 import { DEPART_LABEL } from "@/components/room/ResponseForm";
 import { useRoomContext } from "@/components/room/RoomContext";
@@ -52,7 +53,7 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
   return (
     <div className="space-y-6">
       {/* 응답 현황 + 방장 버튼 */}
-      <section className={card} aria-labelledby="status-title">
+      <Reveal as="section" className={card} aria-labelledby="status-title">
         <div className="flex items-baseline justify-between gap-2">
           <h2 id="status-title" className={h2}>응답 현황</h2>
           <span className="text-lg font-bold text-brand-text">
@@ -85,14 +86,14 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
             )}
           </div>
         )}
-      </section>
+      </Reveal>
 
       {c.responseCount === 0 ? (
         <p className={subtleBox}>아직 응답이 없어요. 친구를 초대하고 응답을 기다려 주세요.</p>
       ) : (
         <>
           {/* 날짜 */}
-          <section className={card} aria-labelledby="dates-title">
+          <Reveal as="section" className={card} aria-labelledby="dates-title">
             <h2 id="dates-title" className={h2}>날짜</h2>
             {c.periods.length > 0 ? (
               <div className="space-y-2">
@@ -123,10 +124,10 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
               total={c.responseCount}
             />
             <p className={muted}>색이 진할수록 가능한 사람이 많아요. 테두리는 전원 가능한 날이에요.</p>
-          </section>
+          </Reveal>
 
           {/* 예산 */}
-          <section className={card} aria-labelledby="budget-title">
+          <Reveal as="section" className={card} aria-labelledby="budget-title">
             <h2 id="budget-title" className={h2}>1인 예산</h2>
             <dl className="grid grid-cols-3 gap-2 text-center">
               {[["최소", c.budget.min], ["중간값", c.budget.median], ["최대", c.budget.max]].map(([label, value]) => (
@@ -146,10 +147,10 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
                 <Bar key={from} label={`${(from / 10000).toLocaleString("ko-KR")}만 원대`} value={count} max={c.responseCount} />
               ))}
             </div>
-          </section>
+          </Reveal>
 
           {/* 스타일·출발 시간대 */}
-          <section className={card} aria-labelledby="style-title">
+          <Reveal as="section" className={card} aria-labelledby="style-title">
             <h2 id="style-title" className={h2}>여행 스타일</h2>
             <div className="space-y-3">
               {c.styleCounts.map((s) => (
@@ -165,13 +166,13 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
                 </li>
               ))}
             </ul>
-          </section>
+          </Reveal>
         </>
       )}
 
       {/* 여행지 */}
       {!trip.destination_fixed && (
-        <section className={card} aria-labelledby="place-title">
+        <Reveal as="section" className={card} aria-labelledby="place-title">
           <h2 id="place-title" className={h2}>여행지 투표</h2>
           {c.destinations.length === 0 ? (
             <p className={muted}>아직 후보가 없어요. 응답할 때 여행지를 제안할 수 있어요.</p>
@@ -217,7 +218,7 @@ export default function Dashboard({ c, onConfirm }: { c: Coordination; onConfirm
               </ul>
             </div>
           )}
-        </section>
+        </Reveal>
       )}
     </div>
   );

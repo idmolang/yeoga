@@ -1,5 +1,6 @@
 // 내 정보: 이름 수정, 로그아웃, 회원 탈퇴
 
+import Reveal from "@/components/Reveal";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import ProfileForm from "@/components/me/ProfileForm";
@@ -47,18 +48,22 @@ export default async function MePage() {
         </p>
       </header>
 
-      <ProfileForm userId={user.id} name={profile.name} avatarUrl={profile.avatar_url} />
+      <Reveal>
+        <ProfileForm userId={user.id} name={profile.name} avatarUrl={profile.avatar_url} />
+      </Reveal>
 
-      <section className={card}>
+      <Reveal as="section" className={card}>
         <h2 className={h2}>로그아웃</h2>
         <form action="/auth/signout" method="post">
           <button type="submit" className={secondaryButton}>
             로그아웃
           </button>
         </form>
-      </section>
+      </Reveal>
 
-      <WithdrawSection hosted={hosted} />
+      <Reveal>
+        <WithdrawSection hosted={hosted} />
+      </Reveal>
     </div>
   );
 }

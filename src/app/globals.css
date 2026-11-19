@@ -181,3 +181,27 @@ select {
     transition: none;
   }
 }
+
+/*
+ * 스크롤 등장 (Reveal 컴포넌트): 투명도 0→1 + 아래에서 10px, 280ms, 한 번만.
+ * 숨김("hidden")은 JS가 화면 아래쪽 요소에만 걸고, 속성이 없으면 항상 보인다.
+ */
+[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translateY(10px);
+}
+[data-reveal="shown"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 280ms var(--ease-out),
+    transform 280ms var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

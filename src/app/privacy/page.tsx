@@ -1,5 +1,6 @@
 // 개인정보 안내 (로그인 전에도 볼 수 있다)
 
+import Reveal from "@/components/Reveal";
 import Link from "next/link";
 import { card, h1, h2, muted } from "@/components/styles";
 
@@ -20,7 +21,7 @@ export default function PrivacyPage() {
         <p className={muted}>여가는 꼭 필요한 정보만 받아요.</p>
       </header>
 
-      <section className={card}>
+      <Reveal as="section" className={card}>
         <dl className="space-y-4">
           {ROWS.map(([title, body]) => (
             <div key={title} className="space-y-0.5">
@@ -29,9 +30,9 @@ export default function PrivacyPage() {
             </div>
           ))}
         </dl>
-      </section>
+      </Reveal>
 
-      <section className={card}>
+      <Reveal as="section" className={card}>
         <h2 className={h2}>탈퇴하면</h2>
         <ul className="list-inside list-disc space-y-1 text-text-secondary">
           <li>닉네임·프로필 사진과 내 응답·의견·좋아요, 개인 준비물은 삭제돼요.</li>
@@ -39,7 +40,7 @@ export default function PrivacyPage() {
           <li>다른 사람과 연결된 지출·정산 기록은 남기되, 내 이름은 &quot;탈퇴한 사용자&quot;로 바뀌어요.</li>
         </ul>
         <p className={muted}>내 정보 페이지에서 직접 탈퇴할 수 있어요.</p>
-      </section>
+      </Reveal>
 
       <Link href="/" className="text-sm font-medium text-brand-text underline">
         처음으로

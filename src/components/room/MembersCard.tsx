@@ -2,6 +2,7 @@
 
 // 참여자 목록 + 이 방에서 쓸 내 이름 바꾸기 + 나가기/방 삭제
 
+import Reveal from "@/components/Reveal";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import FieldError from "@/components/FieldError";
@@ -39,7 +40,7 @@ export default function MembersCard() {
   };
 
   return (
-    <section className={card} aria-labelledby="members-title">
+    <Reveal as="section" className={card} aria-labelledby="members-title">
       <h2 id="members-title" className={h2}>
         참여자 <span className="text-base font-normal text-text-tertiary">{data.members.length}명</span>
       </h2>
@@ -80,6 +81,6 @@ export default function MembersCard() {
         </div>
       )}
       <p className={muted}>이름 외의 개인정보(연락처, 계좌번호)는 받지 않아요.</p>
-    </section>
+    </Reveal>
   );
 }

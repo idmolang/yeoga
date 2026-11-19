@@ -1,5 +1,6 @@
 // 메인: 로그인 전에는 소개, 로그인 후에는 "다같이 여행가자!" 버튼과 내 방 목록 (F-04)
 
+import Reveal from "@/components/Reveal";
 import Link from "next/link";
 import { badge, badgeTone, h1, h2, muted, primaryButtonXl } from "@/components/styles";
 import { formatRange } from "@/lib/date";
@@ -30,18 +31,20 @@ export default async function HomePage() {
             ["조율", "각자 가능한 날짜·예산·스타일을 답하면 자동으로 모아 보여줘요."],
             ["준비", "방장이 확정하면 할 일·일정·예산·준비물이 만들어지고, 같이 고치고 정산해요."],
           ].map(([title, desc], i) => (
-            <li key={title} className="flex gap-3 rounded-xl bg-surface p-4 ring-1 ring-line">
+            <Reveal as="li" index={i} key={title} className="flex gap-3 rounded-xl bg-surface p-4 ring-1 ring-line">
               <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">{i + 1}</span>
               <span>
                 <span className="block font-semibold">{title}</span>
                 <span className={muted}>{desc}</span>
               </span>
-            </li>
+            </Reveal>
           ))}
         </ol>
-        <Link href="/login?next=/new" className={bigButton}>
-          로그인하고 시작하기
-        </Link>
+        <Reveal>
+          <Link href="/login?next=/new" className={bigButton}>
+            로그인하고 시작하기
+          </Link>
+        </Reveal>
         <p className={`text-center ${muted}`}>
           <Link href="/privacy" className="underline">
             개인정보 안내
@@ -81,16 +84,16 @@ export default async function HomePage() {
 
 function TripSection({ title, trips, empty }: { title: string; trips: TripListItem[]; empty: string }) {
   return (
-    <section className="space-y-3">
+    <Reveal as="section" className="space-y-3">
       <h2 className={h2}>{title}</h2>
       {trips.length === 0 ? (
         <p className={muted}>{empty}</p>
       ) : (
         <ul className="space-y-2">
-          {trips.map((t) => {
+          {trips.map((t, i) => {
             const stage = stageOf(t, t.responses[0]?.count ?? 0);
             return (
-              <li key={t.id}>
+              <Reveal as="li" index={i} key={t.id}>
                 <Link
                   href={`/t/${t.invite_code}`}
                   className="block space-y-1.5 rounded-xl bg-surface p-4 ring-1 ring-line transition-colors duration-(--dur-base) hover:ring-brand-500"
@@ -108,11 +111,11 @@ function TripSection({ title, trips, empty }: { title: string; trips: TripListIt
                     <span className="font-semibold text-brand-text">{ddayText(t)}</span>
                   </span>
                 </Link>
-              </li>
+              </Reveal>
             );
           })}
         </ul>
       )}
-    </section>
+    </Reveal>
   );
 }
