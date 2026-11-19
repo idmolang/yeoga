@@ -1,14 +1,14 @@
 // 메인: 로그인 전에는 소개, 로그인 후에는 "다같이 여행가자!" 버튼과 내 방 목록 (F-04)
 
 import Link from "next/link";
-import { badge, badgeTone, h1, h2, muted, primaryButton } from "@/components/styles";
+import { badge, badgeTone, h1, h2, muted, primaryButtonXl } from "@/components/styles";
 import { formatRange } from "@/lib/date";
 import { listMyTrips, type TripListItem } from "@/lib/db";
 import { requireProfile } from "@/lib/profile";
 import { ddayText, stageLabel, stageOf } from "@/lib/stage";
 import { createClient } from "@/lib/supabase/server";
 
-const bigButton = `${primaryButton} w-full rounded-2xl py-5 text-lg`;
+const bigButton = `${primaryButtonXl} w-full`;
 
 export default async function HomePage() {
   const supabase = await createClient();

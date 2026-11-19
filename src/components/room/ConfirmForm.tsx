@@ -6,7 +6,7 @@
 import { useState, type FormEvent } from "react";
 import FieldError from "@/components/FieldError";
 import { useRoomContext } from "@/components/room/RoomContext";
-import { card, choice, fieldLabel, h2, input, muted, primaryButton } from "@/components/styles";
+import { card, choice, fieldLabel, h2, input, muted, primaryButtonL } from "@/components/styles";
 import { budgetTooHigh, type Coordination } from "@/lib/coordinate";
 import { addDays, diffDays, todayISO } from "@/lib/date";
 import { confirmTrip } from "@/lib/db";
@@ -190,7 +190,7 @@ export default function ConfirmForm({ c }: { c: Coordination }) {
 
       <p className={muted}>계획에 반영할 스타일: {c.suggested.styles.map((s) => LABELS.style[s]).join(", ")}</p>
 
-      <button type="submit" disabled={pending} className={`w-full ${primaryButton} py-3 text-base`}>
+      <button type="submit" disabled={pending} className={`w-full ${primaryButtonL}`}>
         {pending ? "계획 만드는 중…" : "확정하고 계획 만들기"}
       </button>
     </form>

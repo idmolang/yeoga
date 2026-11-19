@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type FormEvent } from "react";
 import FieldError from "@/components/FieldError";
-import { card, choice, fieldLabel, input, muted, primaryButton, subtleBox } from "@/components/styles";
+import { card, choice, fieldLabel, input, muted, primaryButtonL, subtleBox } from "@/components/styles";
 import { createProfile, errorMessage } from "@/lib/db";
 import { createClient } from "@/lib/supabase/client";
 import { useValidation } from "@/lib/validation";
@@ -100,7 +100,7 @@ export default function OnboardingForm({
           {error}
         </p>
       )}
-      <button type="submit" disabled={pending} className={`w-full ${primaryButton} py-3 text-base`}>
+      <button type="submit" disabled={pending} className={`w-full ${primaryButtonL}`}>
         {pending ? "저장하는 중…" : "동의하고 시작하기"}
       </button>
     </form>

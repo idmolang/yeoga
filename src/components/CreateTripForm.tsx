@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import FieldError from "@/components/FieldError";
 import StepProgress from "@/components/StepProgress";
-import { choice, fieldLabel, ghostButton, input, muted, primaryButton, secondaryButton } from "@/components/styles";
+import { choice, fieldLabel, ghostButton, input, muted, primaryButtonL, secondaryButton } from "@/components/styles";
 import { addDays, todayISO } from "@/lib/date";
 import { createTrip, errorMessage, type NewTrip } from "@/lib/db";
 import { createClient } from "@/lib/supabase/client";
@@ -220,7 +220,7 @@ export default function CreateTripForm({ defaultHostName }: { defaultHostName: s
         <button type="button" onClick={() => setStep(step - 1)} disabled={step === 0} className={secondaryButton}>
           이전
         </button>
-        <button type="submit" disabled={pending} className={`flex-1 ${primaryButton} py-3 text-base`}>
+        <button type="submit" disabled={pending} className={`flex-1 ${primaryButtonL}`}>
           {isLast ? (pending ? "만드는 중…" : "방 만들기") : "다음"}
         </button>
       </div>

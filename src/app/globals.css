@@ -24,6 +24,8 @@
   --line: #e5e8eb; /* 1px 헤어라인 */
   --text-secondary: #4e5968;
   --text-tertiary: #646f7d; /* 흐린 글자. 흰 바탕 5.1:1, 화면 바탕 4.9:1 */
+  --brand-text: #1f76ae; /* 바탕 위의 링크·강조 글자 (흰 바탕 4.93:1) */
+  --control-border: #8b95a1; /* 체크박스·라디오 테두리 (흰 바탕 3.0:1) */
 
   /* 눌림·비활성·스크림 */
   --press-overlay: rgb(0 0 0 / 0.26);
@@ -53,6 +55,8 @@
     --line: #3c3c47;
     --text-secondary: #c3c3c6;
     --text-tertiary: #9e9ea4;
+    --brand-text: #62aee6; /* 다크 바탕 7.4:1 */
+    --control-border: #7e7e87;
   }
 }
 
@@ -62,20 +66,24 @@
     "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo",
     "Noto Sans KR", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* 라운드 단계 */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 14px;
+  /*
+   * 라운드 단계 (토스 4/8/12/16/20/24). Tailwind 이름에 대응: sm=4 md=8 lg=12 xl=16 2xl=20 3xl=24
+   * (1단계에서 이름만 토스 쪽으로 정의해 기존 rounded-* 값이 의도치 않게 바뀌었던 것을 2단계에서 바로잡는다)
+   */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-2xl: 20px;
   --radius-3xl: 24px;
 
-  /* 글자 크기 단계 (2단계에서 공통 스타일에 적용) */
-  --text-caption: 12px;
-  --text-body-3: 13px;
-  --text-body-2: 15px;
-  --text-body-1: 17px;
+  /* 글자 크기 단계: 본문 15px, 보조 13px, 큰 제목 28px */
+  --text-sm: 13px;
+  --text-sm--line-height: 1.5;
+  --text-base: 15px;
+  --text-base--line-height: 1.5;
+  --text-3xl: 28px;
+  --text-3xl--line-height: 1.3;
 
   /*
    * 1단계 임시 연결: 기존 slate-/sky- 클래스가 새 색을 가리키게 한다.
@@ -112,6 +120,7 @@
   --color-brand-500: var(--brand-500);
   --color-brand-600: var(--brand-600);
   --color-brand-700: var(--brand-700);
+  --color-brand-text: var(--brand-text);
   --color-surface: var(--surface);
   --color-surface-sunken: var(--surface-sunken);
   --color-line: var(--line);
@@ -129,4 +138,74 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-wrap: anywhere;
+}
+
+/*
+ * input·textarea·select 글자는 16px 이상 (iOS Safari 자동 확대 방지).
+ * 레이어 밖에 두어 text-sm 같은 유틸리티 클래스보다 항상 우선한다.
+ */
+input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]),
+textarea,
+select {
+  font-size: max(16px, 1em);
+}
+
+/*
+ * 체크박스·라디오: 실제 input 요소를 그대로 두고 모양만 바꾼다.
+ * 키보드(Tab/Space/화살표)·:focus-visible·label 연결은 브라우저 기본 동작 그대로다.
+ * 레이어 안이라 size-* 같은 유틸리티 클래스로 크기를 덮어쓸 수 있다.
+ */
+@layer base {
+  input[type="checkbox"],
+  input[type="radio"] {
+    appearance: none;
+    display: inline-grid;
+    flex-shrink: 0;
+    place-content: center;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    border: 1.5px solid var(--control-border);
+    background-color: var(--surface);
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-base) var(--ease),
+      border-color var(--dur-base) var(--ease);
+  }
+  input[type="checkbox"] {
+    border-radius: 6px;
+  }
+  input[type="radio"] {
+    border-radius: 999px;
+  }
+  input[type="checkbox"]:checked {
+    border-color: var(--brand-600);
+    background-color: var(--brand-600);
+    background-size: 80% 80%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E");
+  }
+  input[type="radio"]:checked {
+    border-color: var(--brand-600);
+    background-color: var(--brand-600);
+    background-image: radial-gradient(circle, #fff 0 34%, transparent 38%);
+  }
+  input[type="checkbox"]:focus-visible,
+  input[type="radio"]:focus-visible {
+    outline: 2px solid var(--brand-500);
+    outline-offset: 2px;
+  }
+  input[type="checkbox"]:disabled,
+  input[type="radio"]:disabled {
+    opacity: var(--disabled-opacity);
+    cursor: not-allowed;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  input[type="checkbox"],
+  input[type="radio"] {
+    transition: none;
+  }
 }

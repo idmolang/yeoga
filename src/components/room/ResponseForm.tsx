@@ -8,7 +8,7 @@ import FieldError from "@/components/FieldError";
 import DateCalendar from "@/components/room/DateCalendar";
 import { useRoomContext } from "@/components/room/RoomContext";
 import StepProgress from "@/components/StepProgress";
-import { card, choice, fieldLabel, ghostButton, h2, input, muted, primaryButton, secondaryButton, subtleBox } from "@/components/styles";
+import { card, choice, fieldLabel, ghostButton, h2, input, muted, primaryButtonL, secondaryButton, subtleBox } from "@/components/styles";
 import { dateRange, formatKDate, weekday } from "@/lib/date";
 import { saveResponse } from "@/lib/db";
 import { responsesOpen } from "@/lib/stage";
@@ -283,7 +283,7 @@ function ResponseSteps({
 
       <div className="flex gap-3">
         <button type="button" onClick={() => setStep(step - 1)} disabled={step === 0} className={secondaryButton}>이전</button>
-        <button type="submit" disabled={pending} className={`flex-1 ${primaryButton} py-3 text-base`}>
+        <button type="submit" disabled={pending} className={`flex-1 ${primaryButtonL}`}>
           {isLast ? (pending ? "저장하는 중…" : "응답 저장") : "다음"}
         </button>
       </div>
